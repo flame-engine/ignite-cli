@@ -1,3 +1,5 @@
+![Test](https://github.com/flame-engine/ignite-cli/workflows/Test/badge.svg?branch=master&event=push) [![Discord](https://img.shields.io/discord/509714518008528896.svg)](https://discord.gg/pxrBmy4)
+
 # ignite-cli
 
 Simple CLI interface for Ignite; scaffold and setup your Flame projects with ease.
