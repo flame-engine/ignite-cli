@@ -204,6 +204,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.0"
+  process_run:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "luanpotter.fix-directory-conflict"
+      resolved-ref: d08bdc6b1b5c95fa2b2c71f646eddbdfed84b015
+      url: "git@github.com:luanpotter/process_run.dart"
+    source: git
+    version: "0.11.2-dev.1"
   pub_semver:
     dependency: transitive
     description:
@@ -281,6 +290,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.0+2"
   term_glyph:
     dependency: transitive
     description:
@@ -352,4 +368,4 @@ packages:
     source: hosted
     version: "2.2.1"
 sdks:
-  dart: ">=2.9.3 <3.0.0"
+  dart: ">=2.10.0 <3.0.0"

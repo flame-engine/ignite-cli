@@ -1,3 +1,47 @@
-String calculate(String option) {
-  return 'Result: $option';
+import 'package:args/args.dart';
+import 'package:completion/completion.dart' as completion;
+import 'package:ignite_cli/create_command.dart';
+import 'package:process_run/process_run.dart';
+
+void main(List<String> args) async {
+  final parser = ArgParser();
+  parser.addFlag('help', abbr: 'h', help: 'Displays this message.');
+  parser.addFlag('version', abbr: 'v', help: 'Shows relevant version info.');
+
+  final create = parser.addCommand('create');
+  create.addOption(
+    'name',
+    help: 'The name of your game (valid dart identifier).',
+  );
+  create.addOption(
+    'org',
+    help:
+        'The org name, in reveser domain notation (package name/bundle identifier).',
+  );
+
+  final results = completion.tryArgsCompletion(args, parser);
+  if (results['help']) {
+    print(parser.usage);
+    print('');
+    print('List of available commands:');
+    print('');
+    print('create:');
+    print('  ${create.usage}');
+    return;
+  } else if (results['version']) {
+    print('Current version: TODO fetch version');
+    print('');
+    print('Dart & Flutter versions:');
+    print('');
+    await run('dart', ['--version'], verbose: true);
+    await run('flutter', ['--version'], verbose: true);
+    return;
+  }
+
+  final command = results.command;
+  if (command?.name == 'create') {
+    await createCommand(command);
+  } else {
+    print('Invalid command. Please select an option, use --help for help.');
+  }
 }
