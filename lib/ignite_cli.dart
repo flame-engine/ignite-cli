@@ -1,3 +1,3 @@
-int calculate() {
-  return 6 * 7;
+String calculate(String option) {
+  return 'Result: $option';
 }
