@@ -1,9 +1,9 @@
 import 'package:args/args.dart';
 import 'package:completion/completion.dart' as completion;
-import 'package:ignite_cli/create_command.dart';
+import 'create_command.dart';
 import 'package:process_run/process_run.dart';
 
-void main(List<String> args) async {
+void mainCommand(List<String> args) async {
   final parser = ArgParser();
   parser.addFlag('help', abbr: 'h', help: 'Displays this message.');
   parser.addFlag('version', abbr: 'v', help: 'Shows relevant version info.');
@@ -16,7 +16,7 @@ void main(List<String> args) async {
   create.addOption(
     'org',
     help:
-        'The org name, in reveser domain notation (package name/bundle identifier).',
+        'The org name, in reverse domain notation (package name/bundle identifier).',
   );
 
   final results = completion.tryArgsCompletion(args, parser);

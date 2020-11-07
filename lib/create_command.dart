@@ -18,7 +18,7 @@ void createCommand(ArgResults command) async {
 
   await run(
     'flutter',
-    'create --org $org --project-name $name'.split(' '),
+    'create --org $org --project-name $name .'.split(' '),
     verbose: true,
   );
 }
