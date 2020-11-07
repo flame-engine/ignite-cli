@@ -11,7 +11,7 @@ dependencies:
   completion: ^0.2.2
   process_run:
     git:
-      url: git@github.com:luanpotter/process_run.dart
+      url: git://github.com/luanpotter/process_run.dart
       ref: luanpotter.fix-directory-conflict
 
 dev_dependencies:

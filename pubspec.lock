@@ -210,7 +210,7 @@ packages:
       path: "."
       ref: "luanpotter.fix-directory-conflict"
       resolved-ref: d08bdc6b1b5c95fa2b2c71f646eddbdfed84b015
-      url: "git@github.com:luanpotter/process_run.dart"
+      url: "git://github.com/luanpotter/process_run.dart"
     source: git
     version: "0.11.2-dev.1"
   pub_semver:
