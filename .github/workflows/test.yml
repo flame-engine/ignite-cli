@@ -10,10 +10,10 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Setup Flutter
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'beta'
-      - run: git clean -xffd # https://github.com/dart-lang/sdk/issues/39792
+        uses: subosito/flutter-action@v1
+          with:
+            channel: 'beta'
+        run: git clean -xffd # https://github.com/dart-lang/sdk/issues/39792
 
       - name: Setup BATS
         uses: mig4/setup-bats@v1
@@ -21,9 +21,9 @@ jobs:
           bats-version: 1.2.1
 
       - name: Display versions
-      - run: dart --version
-      - run: flutter --version
+        run: dart --version
+        run: flutter --version
 
       - name: Run tests
-      - run: pub get
-      - run: (cd test ; ./run.sh)
+        run: pub get
+        run: (cd test ; ./run.sh)
