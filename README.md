@@ -27,7 +27,7 @@ To run all tests. Always make sure the build is green.
 In order to test the application, run
 
 ```bash
-dart dart bin/ignite_cli.dart
+dart bin/ignite_cli.dart
 ```
 
 ## Credits
