@@ -14,9 +14,9 @@ source ./_inc.sh
   [[ "$result" == "$expected" ]]
 }
 
-@test "create new flutter project with correct project name and org" {
-  ignite create --org xyz.luan --name my_game
-
-  result=$(cat pubspec.yaml | grep "name: my_game")
-  [[ "$result" == "name: my_game" ]]
-}
+# @test "create new flutter project with correct project name and org" {
+#   ignite create --org xyz.luan --name my_game
+# 
+#   result=$(cat pubspec.yaml | grep "name: my_game")
+#   [[ "$result" == "name: my_game" ]]
+# }
