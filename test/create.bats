@@ -19,5 +19,5 @@ source ./_inc.sh
   result=$(cat pubspec.yaml | grep "name: my_game")
   echo "result = $result"
 
-  [[ "$result" == "name: not_my_game" ]]
+  [[ "$result" == "name: my_game" ]]
 }
