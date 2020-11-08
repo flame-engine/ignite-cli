@@ -15,9 +15,9 @@ source ./_inc.sh
 }
 
 @test "create new flutter project with correct project name and org" {
-  run ignite create --org xyz.luan --name my_game
-  echo "status = $status"
-  echo "output = $output"
+  #run ignite create --org xyz.luan --name my_game
+  #echo "status = $status"
+  #echo "output = $output"
 
   result=$(cat pubspec.yaml | grep "name: my_game")
   echo "result = $result"
