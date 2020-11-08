@@ -4,3 +4,4 @@
 # to install run `pacman -S bash-bats` or similar
 
 bats *.bats
+echo 'Finished running bats'

@@ -21,4 +21,5 @@ void createCommand(ArgResults command) async {
     'create --org $org --project-name $name .'.split(' '),
     verbose: true,
   );
+  print('Your new Flame project was successfully created!');
 }
