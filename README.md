@@ -4,6 +4,16 @@
 
 Simple CLI interface for Ignite; scaffold and setup your Flame projects with ease.
 
+## Usage
+
+Install it via pub (or build from src if you prefer the latest version):
+
+```bash
+pub global activate ignite_cli
+```
+
+Then you can run commands like `ignite --version` or `ignite create`.
+
 ## Instructions
 
 Run
