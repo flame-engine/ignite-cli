@@ -3,6 +3,10 @@ description: Ignite your projects with flame; a CLI scaffolding tool to create a
 version: 0.1.0
 homepage: https://flame-engine.org/ignite
 
+# Add the bin/ignite.dart script to the scripts pub installs
+executables:
+  ignite:
+
 environment:
   sdk: '>=2.9.3 <3.0.0'
 
