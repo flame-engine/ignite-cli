@@ -15,7 +15,7 @@ source ./_inc.sh
 }
 
 @test "create new flutter project with correct project name and org" {
-  run bash -ilc ignite create --org xyz.luan --name my_game
+  ignite create --org xyz.luan --name my_game
   echo "status = $status"
   echo "output = $output"
 

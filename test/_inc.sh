@@ -9,7 +9,7 @@ function clean {
 }
 
 function ignite {
-  dart ../../bin/ignite_cli.dart "$@"
+  dart ../../bin/ignite_cli.dart "$@" 3>&-
 }
 
 function clean_ignite {
