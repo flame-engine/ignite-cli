@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 
 # you need to have bats to run the tests
 # to install run `pacman -S bash-bats` or similar
