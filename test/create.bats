@@ -8,12 +8,12 @@ source ./_inc.sh
   [[ "$result" == "$expected" ]]
 }
 
-# @test "create requires name" {
-#   result=$(ignite create --org xyz.luan)
-#   expected=$(clean "The name option is required.")
-#   [[ "$result" == "$expected" ]]
-# }
-# 
+@test "create requires name" {
+  result=$(ignite create --org xyz.luan)
+  expected=$(clean "The name option is required.")
+  [[ "$result" == "$expected" ]]
+}
+
 # @test "create new flutter project with correct project name and org" {
 #   ignite create --org xyz.luan --name my_game
 # 
