@@ -5,8 +5,11 @@ import 'package:process_run/process_run.dart';
 import 'utils.dart';
 
 void createCommand(ArgResults command) async {
+  final interactive = command['interactive'] != 'false';
+
   final name = getString(
     command,
+    interactive,
     'name',
     'Choose a name for your project: ',
     desc: 'Note: this must be a valid dart identifier (no dashes).',
@@ -14,6 +17,7 @@ void createCommand(ArgResults command) async {
 
   final org = getString(
     command,
+    interactive,
     'org',
     'Choose an org for your project: ',
     desc:
@@ -24,18 +28,21 @@ void createCommand(ArgResults command) async {
       ((await run('pwd', [])).stdout as String).replaceAll('\n', '');
   print('\nYour current directory is: $currentDir');
   final createFolder = getOption(
-    command,
-    'create-folder',
-    'Do you want to put your project files directly on the current dir or do you want to create a folder called $name?',
-    {
-      'Create a folder called $name': true,
-      'Put the files directly on $currentDir': false,
-    },
-  );
+        command,
+        interactive,
+        'create-folder',
+        'Do you want to put your project files directly on the current dir or do you want to create a folder called $name?',
+        {
+          'Create a folder called $name': 'true',
+          'Put the files directly on $currentDir': 'false',
+        },
+      ) ==
+      'true';
 
   print('');
   final template = getOption(
     command,
+    interactive,
     'template',
     'What template would you like to use for your new project?',
     {

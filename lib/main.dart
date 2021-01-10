@@ -10,6 +10,13 @@ void mainCommand(List<String> args) async {
 
   final create = parser.addCommand('create');
   create.addOption(
+    'interactive',
+    abbr: 'i',
+    help: 'Whether to run in interactive mode or not.',
+    allowed: ['true', 'false'],
+    defaultsTo: 'true',
+  );
+  create.addOption(
     'name',
     help: 'The name of your game (valid dart identifier).',
   );
@@ -20,6 +27,7 @@ void mainCommand(List<String> args) async {
   );
   create.addOption(
     'create-folder',
+    abbr: 'f',
     help:
         'If you want to create a new folder on the current location with the project name or if you are already on the new project\'s folder.',
     allowed: ['true', 'false'],
