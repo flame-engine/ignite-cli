@@ -18,6 +18,17 @@ void mainCommand(List<String> args) async {
     help:
         'The org name, in reverse domain notation (package name/bundle identifier).',
   );
+  create.addOption(
+    'create-folder',
+    help:
+        'If you want to create a new folder on the current location with the project name or if you are already on the new project\'s folder.',
+    allowed: ['true', 'false'],
+  );
+  create.addOption(
+    'template',
+    help: 'What Flame template you would like to use for your new project',
+    allowed: ['simple', 'example'],
+  );
 
   final results = completion.tryArgsCompletion(args, parser);
   if (results['help']) {
