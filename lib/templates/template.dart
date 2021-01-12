@@ -16,6 +16,14 @@ abstract class Template {
     final binFolder = p.dirname(p.fromUri(Platform.script));
     return p.join(binFolder, '..', 'templates');
   }
+
+  Future<void> copyFile(String from, String to) {
+    return File(from).copy(to);
+  }
+
+  Future<void> rmFile(String from) {
+    return File(from).delete();
+  }
 }
 
 Template getTemplateForName(String name) {

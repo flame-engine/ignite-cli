@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 import 'templates/template.dart';
 import 'package:process_run/process_run.dart';
@@ -24,9 +26,9 @@ void createCommand(ArgResults command) async {
         'Note: this is a dot separated list of "packages", normally in reverse domain notation.',
   );
 
-  final currentDir =
-      ((await run('pwd', [])).stdout as String).replaceAll('\n', '');
+  final currentDir = Directory.current.path;
   print('\nYour current directory is: $currentDir');
+
   final createFolder = getOption(
         command,
         interactive,
