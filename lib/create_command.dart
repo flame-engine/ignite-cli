@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'templates/template.dart';
 import 'package:process_run/process_run.dart';
 
+import 'templates/template.dart';
 import 'utils.dart';
 
-void createCommand(ArgResults command) async {
+Future<void> createCommand(ArgResults command) async {
   final interactive = command['interactive'] != 'false';
 
   final name = getString(

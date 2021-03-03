@@ -1,7 +1,8 @@
 import 'package:args/args.dart';
 import 'package:completion/completion.dart' as completion;
-import 'create_command.dart';
 import 'package:process_run/process_run.dart';
+
+import 'create_command.dart';
 
 void mainCommand(List<String> args) async {
   final parser = ArgParser();
@@ -29,7 +30,7 @@ void mainCommand(List<String> args) async {
     'create-folder',
     abbr: 'f',
     help:
-        'If you want to create a new folder on the current location with the project name or if you are already on the new project\'s folder.',
+        "If you want to create a new folder on the current location with the project name or if you are already on the new project's folder.",
     allowed: ['true', 'false'],
   );
   create.addOption(
@@ -39,7 +40,7 @@ void mainCommand(List<String> args) async {
   );
 
   final results = completion.tryArgsCompletion(args, parser);
-  if (results['help']) {
+  if (results['help'] as bool) {
     print(parser.usage);
     print('');
     print('List of available commands:');
@@ -47,7 +48,7 @@ void mainCommand(List<String> args) async {
     print('create:');
     print('  ${create.usage}');
     return;
-  } else if (results['version']) {
+  } else if (results['version'] as bool) {
     print('Current version: TODO fetch version');
     print('');
     print('Dart & Flutter versions:');

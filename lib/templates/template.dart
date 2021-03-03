@@ -24,12 +24,21 @@ abstract class Template {
   Future<void> rmFile(String from) {
     return File(from).delete();
   }
+
+  Future<void> rmDir(String path) async {
+    final dir = Directory(path);
+    if (dir.existsSync()) {
+      await dir.delete(recursive: true);
+    }
+  }
 }
 
 Template getTemplateForName(String name) {
   final template = {
     'simple': SimpleTemplate(),
   }[name];
-  if (template == null) throw 'Invalid template $name';
+  if (template == null) {
+    throw 'Invalid template $name';
+  }
   return template;
 }

@@ -1,7 +1,6 @@
-import 'dart:io';
+import 'package:process_run/process_run.dart';
 
 import 'template.dart';
-import 'package:process_run/process_run.dart';
 
 class SimpleTemplate extends Template {
   @override
@@ -19,6 +18,6 @@ class SimpleTemplate extends Template {
       '-ie s/\\\${name}/${variables.name}/ $projectDir/pubspec.yaml'.split(' '),
     );
     await rmFile('$projectDir/test/widget_test.dart');
-    await rmFile('$projectDir/integration_test/app_test.dart');
+    await rmDir('$projectDir/integration_test');
   }
 }
