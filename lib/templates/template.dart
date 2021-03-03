@@ -1,24 +1,30 @@
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
-
+import '../utils.dart';
 import 'simple_template.dart';
 
 class Variables {
   String name;
-  Variables(this.name);
+  String flameVersion;
+  Variables(this.name, this.flameVersion);
 }
 
 abstract class Template {
   Future<void> apply(String projectDir, Variables variables);
 
-  String get templatesFolder {
-    final binFolder = p.dirname(p.fromUri(Platform.script));
-    return p.join(binFolder, '..', 'templates');
-  }
+  String get templatesFolder => getBundledFile('templates');
 
-  Future<void> copyFile(String from, String to) {
-    return File(from).copy(to);
+  Future<void> copyFile(
+    String from,
+    String to,
+    Map<String, String> variables,
+  ) async {
+    final input = await File(from).readAsString();
+    final output = variables.entries.fold<String>(
+      input,
+      (lines, element) => lines.replaceAll('\${${element.key}}', element.value),
+    );
+    await File(to).writeAsString(output);
   }
 
   Future<void> rmFile(String from) {

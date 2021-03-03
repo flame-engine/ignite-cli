@@ -1,8 +1,14 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:prompts/prompts.dart' as prompts;
 import 'package:io/ansi.dart' as ansi;
+import 'package:path/path.dart' as p;
+import 'package:prompts/prompts.dart' as prompts;
+
+String getBundledFile(String name) {
+  final binFolder = p.dirname(p.fromUri(Platform.script));
+  return p.join(binFolder, '..', name);
+}
 
 String getString(
   ArgResults results,

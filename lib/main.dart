@@ -1,8 +1,14 @@
+import 'dart:io';
+import 'package:ignite_cli/commands/version_command.dart';
+import 'package:ignite_cli/flame_versions.dart';
+import 'package:yaml/yaml.dart';
+
 import 'package:args/args.dart';
 import 'package:completion/completion.dart' as completion;
 import 'package:process_run/process_run.dart';
 
-import 'create_command.dart';
+import 'commands/create_command.dart';
+import 'templates/template.dart';
 
 void mainCommand(List<String> args) async {
   final parser = ArgParser();
@@ -10,12 +16,11 @@ void mainCommand(List<String> args) async {
   parser.addFlag('version', abbr: 'v', help: 'Shows relevant version info.');
 
   final create = parser.addCommand('create');
-  create.addOption(
+  create.addFlag(
     'interactive',
     abbr: 'i',
     help: 'Whether to run in interactive mode or not.',
-    allowed: ['true', 'false'],
-    defaultsTo: 'true',
+    defaultsTo: true,
   );
   create.addOption(
     'name',
@@ -38,6 +43,11 @@ void mainCommand(List<String> args) async {
     help: 'What Flame template you would like to use for your new project',
     allowed: ['simple', 'example'],
   );
+  create.addOption(
+    'flame-version',
+    help: 'What Flame version you would like to use.',
+    allowed: flameVersions.values,
+  );
 
   final results = completion.tryArgsCompletion(args, parser);
   if (results['help'] as bool) {
@@ -49,12 +59,7 @@ void mainCommand(List<String> args) async {
     print('  ${create.usage}');
     return;
   } else if (results['version'] as bool) {
-    print('Current version: TODO fetch version');
-    print('');
-    print('Dart & Flutter versions:');
-    print('');
-    await run('dart', ['--version'], verbose: true);
-    await run('flutter', ['--version'], verbose: true);
+    await versionCommand();
     return;
   }
 
