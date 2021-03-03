@@ -1,14 +1,9 @@
-import 'dart:io';
-import 'package:ignite_cli/commands/version_command.dart';
-import 'package:ignite_cli/flame_versions.dart';
-import 'package:yaml/yaml.dart';
-
 import 'package:args/args.dart';
 import 'package:completion/completion.dart' as completion;
-import 'package:process_run/process_run.dart';
 
 import 'commands/create_command.dart';
-import 'templates/template.dart';
+import 'commands/version_command.dart';
+import 'flame_versions.dart';
 
 void mainCommand(List<String> args) async {
   final parser = ArgParser();
@@ -16,11 +11,12 @@ void mainCommand(List<String> args) async {
   parser.addFlag('version', abbr: 'v', help: 'Shows relevant version info.');
 
   final create = parser.addCommand('create');
-  create.addFlag(
+  create.addOption(
     'interactive',
     abbr: 'i',
     help: 'Whether to run in interactive mode or not.',
-    defaultsTo: true,
+    allowed: ['true', 'false'],
+    defaultsTo: 'true',
   );
   create.addOption(
     'name',
@@ -47,6 +43,7 @@ void mainCommand(List<String> args) async {
     'flame-version',
     help: 'What Flame version you would like to use.',
     allowed: flameVersions.values,
+    defaultsTo: flameVersions.values.first,
   );
 
   final results = completion.tryArgsCompletion(args, parser);
