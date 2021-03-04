@@ -25,7 +25,8 @@ jobs:
           dart --version
           flutter --version
 
-      - name: Run tests
+      - name: Run analysis and tests
         run: |
           pub get
+          ./scripts/analyze.sh
           (cd test ; ./run.sh)

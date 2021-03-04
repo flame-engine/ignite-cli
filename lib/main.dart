@@ -1,7 +1,9 @@
 import 'package:args/args.dart';
 import 'package:completion/completion.dart' as completion;
-import 'create_command.dart';
-import 'package:process_run/process_run.dart';
+
+import 'commands/create_command.dart';
+import 'commands/version_command.dart';
+import 'flame_versions.dart';
 
 void mainCommand(List<String> args) async {
   final parser = ArgParser();
@@ -29,7 +31,7 @@ void mainCommand(List<String> args) async {
     'create-folder',
     abbr: 'f',
     help:
-        'If you want to create a new folder on the current location with the project name or if you are already on the new project\'s folder.',
+        "If you want to create a new folder on the current location with the project name or if you are already on the new project's folder.",
     allowed: ['true', 'false'],
   );
   create.addOption(
@@ -37,9 +39,15 @@ void mainCommand(List<String> args) async {
     help: 'What Flame template you would like to use for your new project',
     allowed: ['simple', 'example'],
   );
+  create.addOption(
+    'flame-version',
+    help: 'What Flame version you would like to use.',
+    allowed: flameVersions.values,
+    defaultsTo: flameVersions.values.first,
+  );
 
   final results = completion.tryArgsCompletion(args, parser);
-  if (results['help']) {
+  if (results['help'] as bool) {
     print(parser.usage);
     print('');
     print('List of available commands:');
@@ -47,13 +55,8 @@ void mainCommand(List<String> args) async {
     print('create:');
     print('  ${create.usage}');
     return;
-  } else if (results['version']) {
-    print('Current version: TODO fetch version');
-    print('');
-    print('Dart & Flutter versions:');
-    print('');
-    await run('dart', ['--version'], verbose: true);
-    await run('flutter', ['--version'], verbose: true);
+  } else if (results['version'] as bool) {
+    await versionCommand();
     return;
   }
 

@@ -18,8 +18,8 @@ source ./_inc.sh
   ignite create --org xyz.luan --name my_game -i false --create-folder false --template simple
   result=$(cat pubspec.yaml | grep "name: my_game")
   [[ "$result" == "name: my_game" ]]
-  result=$(cat pubspec.yaml | grep "flame: 1.0.0-rc5")
-  [[ "$result" == *"flame: 1.0.0-rc5" ]]
+  result=$(cat pubspec.yaml | grep "flame: 1.0.0-rc7")
+  [[ "$result" == *"flame: 1.0.0-rc7" ]]
   result=$(wc -l < lib/main.dart)
   [ "$result" -le 10 ]
 }

@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'templates/template.dart';
+import 'package:ignite_cli/flame_versions.dart';
 import 'package:process_run/process_run.dart';
 
-import 'utils.dart';
+import '../templates/template.dart';
+import '../utils.dart';
 
-void createCommand(ArgResults command) async {
+Future<void> createCommand(ArgResults command) async {
   final interactive = command['interactive'] != 'false';
 
   final name = getString(
@@ -14,7 +15,8 @@ void createCommand(ArgResults command) async {
     interactive,
     'name',
     'Choose a name for your project: ',
-    desc: 'Note: this must be a valid dart identifier (no dashes).',
+    desc:
+        'Note: this must be a valid dart identifier (no dashes). For example: my_game',
   );
 
   final org = getString(
@@ -23,7 +25,15 @@ void createCommand(ArgResults command) async {
     'org',
     'Choose an org for your project: ',
     desc:
-        'Note: this is a dot separated list of "packages", normally in reverse domain notation.',
+        'Note: this is a dot separated list of "packages", normally in reverse domain notation. For example: org.flame_engine.games',
+  );
+
+  final flameVersion = getOption(
+    command,
+    interactive,
+    'flame-version',
+    'Which Flame version do you wish to use?',
+    flameVersions,
   );
 
   final currentDir = Directory.current.path;
@@ -68,7 +78,7 @@ void createCommand(ArgResults command) async {
     verbose: true,
   );
 
-  final variables = Variables(name);
+  final variables = Variables(name, flameVersion);
   await getTemplateForName(template).apply(actualDir, variables);
   print('Your new Flame project was successfully created!');
 }
