@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Add more options for create, make it more cross compatible and versatile
+
 ## 0.1.0
 
 - Initial version
