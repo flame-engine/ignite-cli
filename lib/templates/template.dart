@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import '../utils.dart';
-import 'simple_template.dart';
+import 'simple/index.dart';
 
 class Variables {
   String name;
@@ -13,6 +13,13 @@ abstract class Template {
   Future<void> apply(String projectDir, Variables variables);
 
   String get templatesFolder => getBundledFile('templates');
+
+  Future<void> createFile(
+    String path,
+    String contents,
+  ) async {
+    await File(path).writeAsString(contents);
+  }
 
   Future<void> copyFile(
     String from,
