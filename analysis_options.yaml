@@ -142,9 +142,9 @@ dart_code_metrics:
   metrics-exclude:
     - test/**
   metrics:
-    number-of-arguments: 8
+    number-of-parameters: 8
     number-of-methods: 32
-    lines-of-executable-code: 200
+    source-lines-of-code: 200
     cyclomatic-complexity: 36
 
 
