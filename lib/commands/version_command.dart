@@ -9,9 +9,9 @@ Future<void> versionCommand() async {
   print('\$ ignite --version:');
   print(await getVersionFromPubspec());
   print('');
-  await run('dart', ['--version'], verbose: true);
+  await runExecutableArguments('dart', ['--version'], verbose: true);
   print('');
-  await run('flutter', ['--version'], verbose: true);
+  await runExecutableArguments('flutter', ['--version'], verbose: true);
 }
 
 Future<String> getVersionFromPubspec() async {

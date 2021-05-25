@@ -15,9 +15,9 @@ String getString(
   bool isInteractive,
   String name,
   String message, {
-  String desc,
+  String? desc,
 }) {
-  var value = results[name] as String;
+  var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null || value.isEmpty) {
       print('Missing parameter $name is required.');
@@ -42,9 +42,9 @@ String getOption(
   String name,
   String message,
   Map<String, String> options, {
-  String desc,
+  String? desc,
 }) {
-  var value = results[name] as String;
+  var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null) {
       print('Missing parameter $name is required.');

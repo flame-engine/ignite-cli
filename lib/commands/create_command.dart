@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:ignite_cli/flame_versions.dart';
 import 'package:process_run/process_run.dart';
 
+import '../flame_versions.dart';
 import '../templates/template.dart';
 import '../utils.dart';
 
@@ -67,11 +67,11 @@ Future<void> createCommand(ArgResults command) async {
 
   final actualDir = '$currentDir${createFolder ? '/$name' : ''}';
   if (createFolder) {
-    await run('mkdir', [actualDir]);
+    await runExecutableArguments('mkdir', [actualDir]);
   }
   print('\nRunning flutter create on $actualDir ...');
 
-  await run(
+  await runExecutableArguments(
     'flutter',
     'create --org $org --project-name $name .'.split(' '),
     workingDirectory: actualDir,

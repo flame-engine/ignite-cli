@@ -62,7 +62,7 @@ void mainCommand(List<String> args) async {
 
   final command = results.command;
   if (command?.name == 'create') {
-    await createCommand(command);
+    await createCommand(command!);
   } else {
     print('Invalid command. Please select an option, use --help for help.');
   }
