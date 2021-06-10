@@ -1,3 +1,7 @@
+## 0.4.0
+
+- Upgrade libraries to work with null-safety
+
 ## 0.3.0
 
 - Use dart files as assets
