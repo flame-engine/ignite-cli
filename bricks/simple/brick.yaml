@@ -1,0 +1,6 @@
+name: simple
+description: An empty Flame project with just the bare minimums to get you up and running.
+vars:
+  - name
+  - description
+  - flame-version
