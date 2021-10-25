@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
 import '../flame_versions.dart';
@@ -8,6 +9,7 @@ import '../templates/template.dart';
 import '../utils.dart';
 
 Future<void> createCommand(ArgResults command) async {
+  final logger = Logger();
   final interactive = command['interactive'] != 'false';
 
   final name = getString(
@@ -37,7 +39,7 @@ Future<void> createCommand(ArgResults command) async {
   );
 
   final currentDir = Directory.current.path;
-  print('\nYour current directory is: $currentDir');
+  logger.info('\nYour current directory is: $currentDir');
 
   final createFolder = getOption(
         command,
@@ -51,7 +53,7 @@ Future<void> createCommand(ArgResults command) async {
       ) ==
       'true';
 
-  print('');
+  logger.info('');
   final template = getOption(
     command,
     interactive,
@@ -69,7 +71,7 @@ Future<void> createCommand(ArgResults command) async {
   if (createFolder) {
     await runExecutableArguments('mkdir', [actualDir]);
   }
-  print('\nRunning flutter create on $actualDir ...');
+  logger.info('\nRunning flutter create on $actualDir ...');
 
   await runExecutableArguments(
     'flutter',
@@ -78,7 +80,20 @@ Future<void> createCommand(ArgResults command) async {
     verbose: true,
   );
 
-  final variables = Variables(name, flameVersion);
-  await getTemplateForName(template).apply(actualDir, variables);
-  print('Your new Flame project was successfully created!');
+  final bundle = getBundleForName(template);
+  final generator = await MasonGenerator.fromBundle(bundle);
+  final generateDone = logger.progress('Generating $name');
+  final target = DirectoryGeneratorTarget(
+    Directory(actualDir),
+    logger,
+    FileConflictResolution.overwrite,
+  );
+  final variables = <String, dynamic>{
+    'name': name,
+    'description': 'A simple Flame game.',
+    'flame-version': flameVersion,
+  };
+  final files = await generator.generate(target, vars: variables);
+  generateDone('Generated $files file(s)');
+  logger.success('Your new Flame project was successfully created!');
 }

@@ -8,6 +8,9 @@ analyzer:
 
   plugins:
     - dart_code_metrics
+  
+  exclude:
+    - bricks/**
 
 linter:
   rules:

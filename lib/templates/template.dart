@@ -1,57 +1,13 @@
-import 'dart:io';
+import 'package:mason/mason.dart';
 
-import '../utils.dart';
-import 'simple/index.dart';
+import 'simple_bundle.dart';
 
-class Variables {
-  String name;
-  String flameVersion;
-  Variables(this.name, this.flameVersion);
-}
-
-abstract class Template {
-  Future<void> apply(String projectDir, Variables variables);
-
-  String get templatesFolder => getBundledFile('templates');
-
-  Future<void> createFile(
-    String path,
-    String contents,
-  ) async {
-    await File(path).writeAsString(contents);
-  }
-
-  Future<void> copyFile(
-    String from,
-    String to,
-    Map<String, String> variables,
-  ) async {
-    final input = await File(from).readAsString();
-    final output = variables.entries.fold<String>(
-      input,
-      (lines, element) => lines.replaceAll('\${${element.key}}', element.value),
-    );
-    await File(to).writeAsString(output);
-  }
-
-  Future<void> rmFile(String from) {
-    return File(from).delete();
-  }
-
-  Future<void> rmDir(String path) async {
-    final dir = Directory(path);
-    if (dir.existsSync()) {
-      await dir.delete(recursive: true);
-    }
-  }
-}
-
-Template getTemplateForName(String name) {
-  final template = {
-    'simple': SimpleTemplate(),
+MasonBundle getBundleForName(String name) {
+  final bundle = {
+    'simple': simpleBundle,
   }[name];
-  if (template == null) {
+  if (bundle == null) {
     throw 'Invalid template $name';
   }
-  return template;
+  return bundle;
 }

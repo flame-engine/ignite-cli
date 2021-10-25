@@ -33,6 +33,20 @@ In order to run the application locally, run
 dart bin/ignite_cli.dart
 ```
 
+## Managing Templates
+
+This project uses [package:mason](https://pub.dev/packages/mason) to manage and generate templates (bricks).
+
+All supported bricks can be found in the [bricks](./bricks) directory.
+
+Whenever a new brick is added or an existing brick is modified, make sure to regenerate the corresponding bundles via:
+
+```bash
+mason bundle bricks/<BRICK-NAME> -t dart -o lib/templates
+```
+
+This will generate a new bundle for `<BRICK-NAME>` under `lib/templates`.
+
 ## Credits
 
 This project was created with [Dart Stagehand](https://github.com/dart-lang/stagehand).
