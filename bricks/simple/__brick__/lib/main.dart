@@ -5,4 +5,4 @@ void main() {
   runApp(GameWidget(game: MyGame()));
 }
 
-class MyGame extends BaseGame {}
+class MyGame extends FlameGame {}
