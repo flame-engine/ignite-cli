@@ -44,12 +44,17 @@ String getOption(
   String message,
   Map<String, String> options, {
   String? desc,
+  String? defaultsTo,
 }) {
   var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null) {
-      print('Missing parameter $name is required.');
-      exit(1);
+      if (defaultsTo != null) {
+        return defaultsTo;
+      } else {
+        print('Missing parameter $name is required.');
+        exit(1);
+      }
     }
   }
   if (value != null && !options.values.contains(value)) {
@@ -81,8 +86,12 @@ List<String> getMultiOption(
   var value = results[name] as List<String>? ?? [];
   if (!isInteractive) {
     if (value.isEmpty) {
-      print('Missing parameter $name is required.');
-      exit(1);
+      if (startingOptions.isNotEmpty) {
+        return startingOptions;
+      } else {
+        print('Missing parameter $name is required.');
+        exit(1);
+      }
     }
   }
   if (value.any((e) => !options.contains(e))) {

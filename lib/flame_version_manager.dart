@@ -52,8 +52,11 @@ enum Package {
   final bool isDevDependency;
   const Package(this.name, {this.isDevDependency = false});
 
-  Map<String, String> toMustache(Map<Package, Versions> versions) {
-    final version = versions[this]!.main;
+  Map<String, String> toMustache(
+    Map<Package, Versions> versions,
+    String flameVersion,
+  ) {
+    final version = this == flame ? flameVersion : versions[this]!.main;
     return {'name': name, 'version': version};
   }
 

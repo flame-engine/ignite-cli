@@ -9,15 +9,11 @@ environment:
 
 dependencies:
   flutter:
-    sdk: flutter
-  {{#extra-dependencies}}
-  {{name}}: {{version}}
-  {{/extra-dependencies}}
+    sdk: flutter{{#extra-dependencies}}
+  {{name}}: {{version}}{{/extra-dependencies}}
 
-dev_dependencies:
-  {{#extra-dev-dependencies}}
-  {{name}}: {{version}}
-  {{/extra-dev-dependencies}}
+dev_dependencies:{{#extra-dev-dependencies}}
+  {{name}}: {{version}}{{/extra-dev-dependencies}}
   flutter_test:
     sdk: flutter
   integration_test:

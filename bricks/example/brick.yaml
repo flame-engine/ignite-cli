@@ -12,5 +12,7 @@ vars:
     type: string
   flame-lint-version:
     type: string
-  extra-packages:
+  extra-dependencies:
+    type: array
+  extra-dev-dependencies:
     type: array

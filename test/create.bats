@@ -15,11 +15,11 @@ source ./_inc.sh
 }
 
 @test "create new flutter project with correct project name and org" {
-  ignite create --org xyz.luan --name my_game -i false --create-folder false --template simple
+  ignite create --org xyz.luan --name my_game -i false --create-folder false --template simple --flame-version 1.2.1
   result=$(cat pubspec.yaml | grep "name: my_game")
   [[ "$result" == "name: my_game" ]]
-  result=$(cat pubspec.yaml | grep "flame: 1.0.0-releasecandidate.11")
-  [[ "$result" == *"flame: 1.0.0-releasecandidate.11" ]]
+  result=$(cat pubspec.yaml | grep "flame: 1.2.1")
+  [[ "$result" == *"flame: 1.2.1" ]]
   result=$(wc -l < lib/main.dart)
-  [ "$result" -le 10 ]
+  [ "$result" -le 15 ]
 }

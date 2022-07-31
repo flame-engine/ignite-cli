@@ -12,16 +12,18 @@ import 'package:process_run/process_run.dart';
 Future<void> createCommand(ArgResults command) async {
   final interactive = command['interactive'] != 'false';
 
-  stdout.write('\nWelcome to ${ansi.red.wrap('Ignite CLI')}! 🔥\n');
-  stdout.write("Let's create a new project!\n\n");
+  if (interactive) {
+    stdout.write('\nWelcome to ${ansi.red.wrap('Ignite CLI')}! 🔥\n');
+    stdout.write("Let's create a new project!\n\n");
+  }
 
   final name = getString(
     command,
     interactive,
     'name',
     'Choose a name for your project: ',
-    desc:
-        'Note: this must be a valid dart identifier (no dashes). For example: my_game',
+    desc: 'Note: this must be a valid dart identifier (no dashes). '
+        'For example: my_game',
   );
 
   final org = getString(
@@ -42,7 +44,12 @@ Future<void> createCommand(ArgResults command) async {
     'flame-version',
     'Which Flame version do you wish to use?',
     flameVersions.versions.associateWith((e) => e),
+    defaultsTo: flameVersions.versions.first,
   );
+
+  print('--------------------');
+  print('$flameVersion');
+  print('--------------------');
 
   final extraPackageOptions = FlameVersionManager.singleton.versions.keys
       .where((key) => !Package.includedByDefault.contains(key))
@@ -120,10 +127,12 @@ Future<void> createCommand(ArgResults command) async {
     'name': name,
     'description': 'A simple Flame game.',
     'version': '0.1.0',
-    'extra-dependencies':
-        dependencies.map((package) => package.toMustache(versions)).toList(),
-    'extra-dev-dependencies':
-        devDependencies.map((package) => package.toMustache(versions)).toList(),
+    'extra-dependencies': dependencies
+        .map((package) => package.toMustache(versions, flameVersion))
+        .toList(),
+    'extra-dev-dependencies': devDependencies
+        .map((package) => package.toMustache(versions, flameVersion))
+        .toList(),
   };
   final files = await generator.generate(target, vars: variables);
 
@@ -136,6 +145,12 @@ Future<void> createCommand(ArgResults command) async {
       verbose: true,
     );
   }
+  await runExecutableArguments(
+    'flutter',
+    'pub get'.split(' '),
+    workingDirectory: actualDir,
+    verbose: true,
+  );
 
   print('Updated ${files.length} files on top of flutter create.\n');
   print('Your new Flame project was successfully created!');
