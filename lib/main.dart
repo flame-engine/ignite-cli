@@ -25,14 +25,14 @@ Future<void> mainCommand(List<String> args) async {
   );
   create.addOption(
     'org',
-    help:
-        'The org name, in reverse domain notation (package name/bundle identifier).',
+    help: 'The org name, in reverse domain notation '
+        '(package name/bundle identifier).',
   );
   create.addOption(
     'create-folder',
     abbr: 'f',
-    help:
-        "If you want to create a new folder on the current location with the project name or if you are already on the new project's folder.",
+    help: 'If you want to create a new folder on the current location with '
+        "the project name or if you are already on the new project's folder.",
     allowed: ['true', 'false'],
   );
   create.addOption(

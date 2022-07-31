@@ -47,10 +47,6 @@ Future<void> createCommand(ArgResults command) async {
     defaultsTo: flameVersions.versions.first,
   );
 
-  print('--------------------');
-  print('$flameVersion');
-  print('--------------------');
-
   final extraPackageOptions = FlameVersionManager.singleton.versions.keys
       .where((key) => !Package.includedByDefault.contains(key))
       .map((key) => key.name)
@@ -69,7 +65,7 @@ Future<void> createCommand(ArgResults command) async {
       .toSet()
       .union(Package.includedByDefault);
 
-  // TODO(luan) use partition function
+  // TODO(luan): use partition function
   final dependencies = packages.where((e) => !e.isDevDependency);
   final devDependencies = packages.where((e) => e.isDevDependency);
 
