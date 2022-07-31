@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:charcode/ascii.dart' as ascii;
 import 'package:io/ansi.dart' as ansi;
 import 'package:path/path.dart' as p;
 import 'package:prompts/prompts.dart' as prompts;
@@ -43,12 +44,17 @@ String getOption(
   String message,
   Map<String, String> options, {
   String? desc,
+  String? defaultsTo,
 }) {
   var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null) {
-      print('Missing parameter $name is required.');
-      exit(1);
+      if (defaultsTo != null) {
+        return defaultsTo;
+      } else {
+        print('Missing parameter $name is required.');
+        exit(1);
+      }
     }
   }
   if (value != null && !options.values.contains(value)) {
@@ -65,4 +71,117 @@ String getOption(
     }
   }
   return value;
+}
+
+List<String> getMultiOption(
+  ArgResults results,
+  bool isInteractive,
+  String name,
+  String message,
+  bool required,
+  List<String> options, {
+  List<String> startingOptions = const [],
+  String? desc,
+}) {
+  var value = results[name] as List<String>? ?? [];
+  if (!isInteractive) {
+    if (value.isEmpty) {
+      if (startingOptions.isNotEmpty) {
+        return startingOptions;
+      } else {
+        print('Missing parameter $name is required.');
+        exit(1);
+      }
+    }
+  }
+  if (value.any((e) => !options.contains(e))) {
+    print('Invalid value $value provided. Must be in: $options');
+    value = [];
+  }
+  if (desc != null) {
+    stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
+  }
+  value = cbx(message, options, startingOptions);
+  if (desc != null) {
+    stdout.write('\r\u{1B}[K');
+  }
+  return value;
+}
+
+List<String> cbx(
+  String message,
+  List<String> keys,
+  List<String> startingKeys,
+) {
+  final selected = startingKeys;
+  var hereIdx = 0;
+
+  var needsClear = false;
+  void writeIt() {
+    if (needsClear) {
+      for (var i = 0; i <= keys.length; i++) {
+        prompts.goUpOneLine();
+        prompts.clearLine();
+      }
+    } else {
+      needsClear = true;
+    }
+    print(message);
+    keys.asMap().forEach((index, option) {
+      final isSelected = selected.contains(option);
+      final isHere = index == hereIdx;
+      final text = ' ${isSelected ? '♦' : '♢'} $option';
+      final color = isHere ? ansi.cyan : ansi.darkGray;
+      print(color.wrap(text));
+    });
+  }
+
+  final oldEchoMode = stdin.echoMode;
+  final oldLineMode = stdin.lineMode;
+  while (true) {
+    int ch;
+    writeIt();
+
+    try {
+      stdin.lineMode = stdin.echoMode = false;
+      ch = stdin.readByteSync();
+
+      if (ch == ascii.$esc) {
+        ch = stdin.readByteSync();
+        if (ch == ascii.$lbracket) {
+          ch = stdin.readByteSync();
+          if (ch == ascii.$A) {
+            // Up key
+            hereIdx--;
+            if (hereIdx < 0) {
+              hereIdx = keys.length - 1;
+            }
+            writeIt();
+          } else if (ch == ascii.$B) {
+            // Down key
+            hereIdx++;
+            if (hereIdx >= keys.length) {
+              hereIdx = 0;
+            }
+            writeIt();
+          }
+        }
+      } else if (ch == ascii.$lf) {
+        // Enter key pressed - submit
+        return selected;
+      } else if (ch == ascii.$space) {
+        // Space key pressed - selected/unselect
+        final key = keys[hereIdx];
+        if (selected.contains(key)) {
+          selected.remove(key);
+        } else {
+          selected.add(key);
+        }
+        writeIt();
+      }
+    } finally {
+      stdin.lineMode = oldLineMode;
+      stdin.echoMode = oldEchoMode;
+    }
+  }
 }

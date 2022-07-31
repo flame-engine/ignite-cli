@@ -1,24 +1,29 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:dartlin/dartlin.dart';
+import 'package:ignite_cli/flame_version_manager.dart';
+import 'package:ignite_cli/templates/template.dart';
+import 'package:ignite_cli/utils.dart';
+import 'package:io/ansi.dart' as ansi;
 import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
-import '../flame_versions.dart';
-import '../templates/template.dart';
-import '../utils.dart';
-
 Future<void> createCommand(ArgResults command) async {
-  final logger = Logger();
   final interactive = command['interactive'] != 'false';
+
+  if (interactive) {
+    stdout.write('\nWelcome to ${ansi.red.wrap('Ignite CLI')}! 🔥\n');
+    stdout.write("Let's create a new project!\n\n");
+  }
 
   final name = getString(
     command,
     interactive,
     'name',
     'Choose a name for your project: ',
-    desc:
-        'Note: this must be a valid dart identifier (no dashes). For example: my_game',
+    desc: 'Note: this must be a valid dart identifier (no dashes). '
+        'For example: my_game',
   );
 
   final org = getString(
@@ -26,26 +31,53 @@ Future<void> createCommand(ArgResults command) async {
     interactive,
     'org',
     'Choose an org for your project: ',
-    desc:
-        'Note: this is a dot separated list of "packages", normally in reverse domain notation. For example: org.flame_engine.games',
+    desc: 'Note: this is a dot separated list of "packages", '
+        'normally in reverse domain notation. '
+        'For example: org.flame_engine.games',
   );
 
+  final versions = FlameVersionManager.singleton.versions;
+  final flameVersions = versions[Package.flame]!;
   final flameVersion = getOption(
     command,
     interactive,
     'flame-version',
     'Which Flame version do you wish to use?',
-    flameVersions,
+    flameVersions.versions.associateWith((e) => e),
+    defaultsTo: flameVersions.versions.first,
   );
 
+  final extraPackageOptions = FlameVersionManager.singleton.versions.keys
+      .where((key) => !Package.includedByDefault.contains(key))
+      .map((key) => key.name)
+      .toList();
+  final extraPackages = getMultiOption(
+    command,
+    interactive,
+    'extra-packages',
+    'Which extra packages do you wish to include?',
+    false,
+    extraPackageOptions,
+    startingOptions: Package.preSelectedByDefault.map((e) => e.name).toList(),
+  );
+  final packages = extraPackages
+      .map(Package.valueOf)
+      .toSet()
+      .union(Package.includedByDefault);
+
+  // TODO(luan): use partition function
+  final dependencies = packages.where((e) => !e.isDevDependency);
+  final devDependencies = packages.where((e) => e.isDevDependency);
+
   final currentDir = Directory.current.path;
-  logger.info('\nYour current directory is: $currentDir');
+  print('\nYour current directory is: $currentDir');
 
   final createFolder = getOption(
         command,
         interactive,
         'create-folder',
-        'Do you want to put your project files directly on the current dir or do you want to create a folder called $name?',
+        'Do you want to put your project files directly on the current dir, '
+            'or do you want to create a folder called $name?',
         {
           'Create a folder called $name': 'true',
           'Put the files directly on $currentDir': 'false',
@@ -53,25 +85,21 @@ Future<void> createCommand(ArgResults command) async {
       ) ==
       'true';
 
-  logger.info('');
+  print('\n');
   final template = getOption(
     command,
     interactive,
     'template',
     'What template would you like to use for your new project?',
-    {
-      'Simple: an empty Flame project with just the bare minimums to get you up and running.':
-          'simple',
-      'Example: a very simple example game built on top of Simple; give you some ideas of how to use Flame if you are new.':
-          'example',
-    },
+    Template.templates
+        .associate((e) => Pair('${e.name}: ${e.description}', e.key)),
   );
 
   final actualDir = '$currentDir${createFolder ? '/$name' : ''}';
   if (createFolder) {
     await runExecutableArguments('mkdir', [actualDir]);
   }
-  logger.info('\nRunning flutter create on $actualDir ...');
+  print('\nRunning flutter create on $actualDir ...');
 
   await runExecutableArguments(
     'flutter',
@@ -79,21 +107,47 @@ Future<void> createCommand(ArgResults command) async {
     workingDirectory: actualDir,
     verbose: true,
   );
+  await runExecutableArguments(
+    'rm',
+    '-rf lib test'.split(' '),
+    workingDirectory: actualDir,
+    verbose: true,
+  );
 
-  final bundle = getBundleForName(template);
+  final bundle = Template.byKey(template).bundle;
   final generator = await MasonGenerator.fromBundle(bundle);
-  final generateDone = logger.progress('Generating $name');
   final target = DirectoryGeneratorTarget(
     Directory(actualDir),
-    logger,
-    FileConflictResolution.overwrite,
   );
   final variables = <String, dynamic>{
     'name': name,
     'description': 'A simple Flame game.',
-    'flame-version': flameVersion,
+    'version': '0.1.0',
+    'extra-dependencies': dependencies
+        .map((package) => package.toMustache(versions, flameVersion))
+        .toList(),
+    'extra-dev-dependencies': devDependencies
+        .map((package) => package.toMustache(versions, flameVersion))
+        .toList(),
   };
   final files = await generator.generate(target, vars: variables);
-  generateDone('Generated $files file(s)');
-  logger.success('Your new Flame project was successfully created!');
+
+  final canHaveTests = devDependencies.contains(Package.flameTest);
+  if (!canHaveTests) {
+    await runExecutableArguments(
+      'rm',
+      '-rf test'.split(' '),
+      workingDirectory: actualDir,
+      verbose: true,
+    );
+  }
+  await runExecutableArguments(
+    'flutter',
+    'pub get'.split(' '),
+    workingDirectory: actualDir,
+    verbose: true,
+  );
+
+  print('Updated ${files.length} files on top of flutter create.\n');
+  print('Your new Flame project was successfully created!');
 }

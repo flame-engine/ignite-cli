@@ -8,20 +8,22 @@ executables:
   ignite:
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
   args: ^2.1.0
   completion: ^1.0.0
-  io: ^1.0.0
-  mason: ^0.0.1-dev.55
-  path: ^1.8.0
-  process_run: ^0.12.1
+  dartlin: ^0.6.3
+  http: ^0.13.4
+  io: ^1.0.3
+  mason: ^0.1.0-dev.31
+  path: ^1.8.2
+  process_run: ^0.12.3+2
   prompts: ^2.0.0
   yaml: ^3.1.0
 
 dev_dependencies:
-  test: ^1.16.0
-  dart_code_metrics: ^3.2.2
   dartdoc: ^0.42.0
+  flame_lint: ^0.1.1
   pedantic: ^1.11.0
+  test: ^1.16.0

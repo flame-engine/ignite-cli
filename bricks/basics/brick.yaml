@@ -1,5 +1,5 @@
-name: simple
-description: An empty Flame project with just the bare minimums to get you up and running.
+name: basics
+description: The basic structure that most games will require. No boilerplate required, but no extra fluff.
 version: 0.1.0
 vars:
   name:

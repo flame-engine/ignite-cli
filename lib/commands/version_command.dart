@@ -1,12 +1,11 @@
 import 'dart:io';
 
+import 'package:ignite_cli/utils.dart';
 import 'package:process_run/process_run.dart';
 import 'package:yaml/yaml.dart';
 
-import '../utils.dart';
-
 Future<void> versionCommand() async {
-  print('\$ ignite --version:');
+  print(r'$ ignite --version:');
   print(await getVersionFromPubspec());
   print('');
   await runExecutableArguments('dart', ['--version'], verbose: true);

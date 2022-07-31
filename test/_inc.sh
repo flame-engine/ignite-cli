@@ -9,7 +9,7 @@ function clean {
 }
 
 function ignite {
-  dart --no-sound-null-safety ../../bin/ignite.dart "$@" 3>&-
+  dart ../../bin/ignite.dart "$@" 3>&-
 }
 
 function clean_ignite {
