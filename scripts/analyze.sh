@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-pub get
+dart pub get
 
 result=$(dart analyze .)
 if ! echo "$result" | grep -q "No issues found!"; then

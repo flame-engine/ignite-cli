@@ -27,6 +27,6 @@ jobs:
 
       - name: Run analysis and tests
         run: |
-          pub get
+          dart pub get
           ./scripts/analyze.sh
           (cd test ; ./run.sh)
