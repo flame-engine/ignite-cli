@@ -1,5 +1,5 @@
-name: simple
-description: An empty Flame project with just the bare minimums to get you up and running.
+name: example
+description: An actual complete, working game example. Extra code that you won't need but will teach you how to wire the most important pieces.
 version: 0.1.0
 vars:
   name:

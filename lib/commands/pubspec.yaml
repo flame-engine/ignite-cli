@@ -10,11 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: {{flame-version}}{{#extra-packages}}
-  {{name}}: {{version}}{{/extra-packages}}
+  flame: {{flame-version}}
+  {{#extra-packages}}
+    {{.}}
+  {{/extra-packages}}
 
 dev_dependencies:
-  flame_lint: {{flame-lint-version}}
+  flame_lint: 0.1.1
   flutter_test:
     sdk: flutter
   integration_test:
