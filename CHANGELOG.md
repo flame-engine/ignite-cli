@@ -1,3 +1,7 @@
+## 0.5.0-rc.1
+
+- Upgraded to mason 0.1.0-dev.31
+
 ## 0.4.0
 
 - Upgrade libraries to work with null-safety
