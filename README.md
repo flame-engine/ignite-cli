@@ -6,6 +6,7 @@
 
 Simple CLI interface for Ignite; scaffold and setup your Flame projects with ease.
 
+
 ## Usage
 
 Install it via pub (or build from src if you prefer the latest version):
@@ -14,9 +15,17 @@ Install it via pub (or build from src if you prefer the latest version):
 pub global activate ignite_cli
 ```
 
-Then you can run commands like `ignite --version` or `ignite create`.
+After you have added the bin folder to your path (the previous command will tell you what to add),
+you can create a new project with Ignite, just run:
 
-## Instructions
+```bash
+ignite create
+```
+
+And follow the instructions.
+
+
+## Instructions for contributors
 
 Run
 
@@ -33,6 +42,7 @@ In order to run the application locally, run
 dart bin/ignite_cli.dart
 ```
 
+
 ## Managing Templates
 
 This project uses [package:mason](https://pub.dev/packages/mason) to manage and generate templates (bricks).
@@ -46,6 +56,7 @@ mason bundle bricks/<BRICK-NAME> -t dart -o lib/templates
 ```
 
 This will generate a new bundle for `<BRICK-NAME>` under `lib/templates`.
+
 
 ## Credits
 
