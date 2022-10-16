@@ -1,6 +1,6 @@
 name: ignite_cli
 description: Ignite your projects with flame; a CLI scaffolding tool to create and setup your Flame projects
-version: 0.5.0-rc.1
+version: 0.5.0
 repository: https://github.com/flame-engine/ignite-cli
 
 # Add the bin/ignite.dart script to the scripts pub installs
@@ -17,7 +17,7 @@ dependencies:
   dartlin: ^0.6.3
   http: ^0.13.4
   io: ^1.0.3
-  mason: ^0.1.0-dev.31
+  mason: ^0.1.0-dev.34
   path: ^1.8.2
   process_run: ^0.12.3+2
   prompts: ^2.0.0
