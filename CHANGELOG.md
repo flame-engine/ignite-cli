@@ -1,3 +1,7 @@
+## 0.5.0
+
+- Upgraded to mason 0.1.0-dev.34
+
 ## 0.5.0-rc.1
 
 - Upgraded to mason 0.1.0-dev.31
