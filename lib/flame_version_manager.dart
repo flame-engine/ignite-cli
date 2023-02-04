@@ -67,11 +67,14 @@ enum Package {
 
 class Versions {
   final List<String> versions;
+
   String get main => versions.first;
+  List<String> get visible => versions.take(5).toList();
+
   const Versions(this.versions);
 
   factory Versions.parse(List<Map<String, dynamic>> json) {
     final versions = json.map((e) => e['version'] as String).toList().reversed;
-    return Versions(versions.take(3).toList());
+    return Versions(versions.toList());
   }
 }

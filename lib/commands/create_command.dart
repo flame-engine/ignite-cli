@@ -43,8 +43,9 @@ Future<void> createCommand(ArgResults command) async {
     interactive,
     'flame-version',
     'Which Flame version do you wish to use?',
-    flameVersions.versions.associateWith((e) => e),
+    flameVersions.visible.associateWith((e) => e),
     defaultsTo: flameVersions.versions.first,
+    fullOptions: flameVersions.versions.associateWith((e) => e),
   );
 
   final extraPackageOptions = FlameVersionManager.singleton.versions.keys
