@@ -45,6 +45,7 @@ String getOption(
   Map<String, String> options, {
   String? desc,
   String? defaultsTo,
+  Map<String, String> fullOptions = const {},
 }) {
   var value = results[name] as String?;
   if (!isInteractive) {
@@ -57,7 +58,8 @@ String getOption(
       }
     }
   }
-  if (value != null && !options.values.contains(value)) {
+  final fullValues = {...options, ...fullOptions}.values;
+  if (value != null && !fullValues.contains(value)) {
     print('Invalid value $value provided. Must be in: ${options.values}');
     value = null;
   }

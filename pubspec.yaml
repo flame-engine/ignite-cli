@@ -17,14 +17,15 @@ dependencies:
   dartlin: ^0.6.3
   http: ^0.13.4
   io: ^1.0.3
-  mason: ^0.1.0-dev.34
+  mason: ^0.1.0-dev.41
   path: ^1.8.2
   process_run: ^0.12.3+2
   prompts: ^2.0.0
   yaml: ^3.1.0
 
 dev_dependencies:
-  dartdoc: ^0.42.0
-  flame_lint: ^0.1.1
+  dartdoc: ^6.1.5
+  flame_lint: ^0.2.0
+  mason_cli: ^0.1.0-dev.44
   pedantic: ^1.11.0
   test: ^1.16.0
