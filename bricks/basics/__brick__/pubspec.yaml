@@ -5,12 +5,12 @@ version: {{version}}
 publish_to: 'none'
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
-dependencies:
-  flutter:
-    sdk: flutter{{#extra-dependencies}}
+dependencies:{{#extra-dependencies}}
   {{name}}: {{version}}{{/extra-dependencies}}
+  flutter:
+    sdk: flutter
 
 dev_dependencies:{{#extra-dev-dependencies}}
   {{name}}: {{version}}{{/extra-dev-dependencies}}

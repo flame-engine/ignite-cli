@@ -36,6 +36,8 @@ cd test
 
 To run all tests. Always make sure the build is green.
 
+You will need to install the bash testing framework [bats](https://bats-core.readthedocs.io/en/stable/installation.html).
+
 In order to run the application locally, run
 
 ```bash

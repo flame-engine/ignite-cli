@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
@@ -12,16 +12,31 @@ void main() {
   runApp(GameWidget(game: MyGame()));
 }
 
+class MyGame extends FlameGame with TapCallbacks {
+  late final MyComponent myComponent;
+
+  @override
+  Future<void> onLoad() async {
+    await world.add(myComponent = MyComponent());
+    return super.onLoad();
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    myComponent.speed.x = -1 + 2 * _rng.nextDouble();
+    myComponent.speed.y = -1 + 2 * _rng.nextDouble();
+  }
+}
+
 class MyComponent extends PositionComponent with HasGameRef<MyGame> {
   static final _paint = BasicPalette.white.paint();
   final Vector2 speed = Vector2.zero();
 
-  @override
-  @override
-  Future<void> onLoad() async {
-    anchor = Anchor.center;
-    position = gameRef.size / 2;
-  }
+  MyComponent()
+      : super(
+          anchor: Anchor.center,
+          size: Vector2.all(32),
+        );
 
   @override
   void render(Canvas c) {
@@ -30,22 +45,6 @@ class MyComponent extends PositionComponent with HasGameRef<MyGame> {
 
   @override
   void update(double dt) {
-    position += speed * dt;
-  }
-}
-
-class MyGame extends FlameGame with TapDetector {
-  late final MyComponent myComponent;
-
-  @override
-  Future<void> onLoad() async {
-    await add(myComponent = MyComponent());
-    return super.onLoad();
-  }
-
-  @override
-  void onTap() {
-    myComponent.speed.x = -5 + 10 * _rng.nextDouble();
-    myComponent.speed.y = -5 + 10 * _rng.nextDouble();
+    position += speed * 32.0 * dt;
   }
 }

@@ -187,3 +187,9 @@ List<String> cbx(
     }
   }
 }
+
+extension SortedBy<T> on Iterable<T> {
+  Iterable<T> sortedBy(Comparable Function(T) selector) {
+    return toList()..sort((a, b) => selector(a).compareTo(selector(b)));
+  }
+}
