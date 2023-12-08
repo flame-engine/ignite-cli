@@ -28,7 +28,7 @@ class MyGame extends FlameGame with TapCallbacks {
   }
 }
 
-class MyComponent extends PositionComponent with HasGameRef<MyGame> {
+class MyComponent extends PositionComponent with HasGameReference<MyGame> {
   static final _paint = BasicPalette.white.paint();
   final Vector2 speed = Vector2.zero();
 
