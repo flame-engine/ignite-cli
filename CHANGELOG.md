@@ -1,3 +1,7 @@
+## 0.6.0
+
+- Upgraded to Flame v1.11.0
+ 
 ## 0.5.0
 
 - Upgraded to mason 0.1.0-dev.34
