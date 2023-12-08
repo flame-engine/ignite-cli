@@ -13,9 +13,9 @@ String getBundledFile(String name) {
 
 String getString(
   ArgResults results,
-  bool isInteractive,
   String name,
   String message, {
+  required bool isInteractive,
   String? desc,
 }) {
   var value = results[name] as String?;
@@ -39,10 +39,10 @@ String getString(
 
 String getOption(
   ArgResults results,
-  bool isInteractive,
   String name,
   String message,
   Map<String, String> options, {
+  required bool isInteractive,
   String? desc,
   String? defaultsTo,
   Map<String, String> fullOptions = const {},
@@ -77,11 +77,11 @@ String getOption(
 
 List<String> getMultiOption(
   ArgResults results,
-  bool isInteractive,
   String name,
   String message,
-  bool required,
   List<String> options, {
+  required bool isInteractive,
+  required bool isRequired,
   List<String> startingOptions = const [],
   String? desc,
 }) {

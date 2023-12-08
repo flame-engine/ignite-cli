@@ -18,8 +18,8 @@ Future<void> createCommand(ArgResults command) async {
   }
 
   final name = getString(
+    isInteractive: interactive,
     command,
-    interactive,
     'name',
     'Choose a name for your project: ',
     desc: 'Note: this must be a valid dart identifier (no dashes). '
@@ -27,8 +27,8 @@ Future<void> createCommand(ArgResults command) async {
   );
 
   final org = getString(
+    isInteractive: interactive,
     command,
-    interactive,
     'org',
     'Choose an org for your project: ',
     desc: 'Note: this is a dot separated list of "packages", '
@@ -39,8 +39,8 @@ Future<void> createCommand(ArgResults command) async {
   final versions = FlameVersionManager.singleton.versions;
   final flameVersions = versions[Package.flame]!;
   final flameVersion = getOption(
+    isInteractive: interactive,
     command,
-    interactive,
     'flame-version',
     'Which Flame version do you wish to use?',
     flameVersions.visible.associateWith((e) => e),
@@ -53,11 +53,11 @@ Future<void> createCommand(ArgResults command) async {
       .map((key) => key.name)
       .toList();
   final extraPackages = getMultiOption(
+    isInteractive: interactive,
+    isRequired: false,
     command,
-    interactive,
     'extra-packages',
     'Which extra packages do you wish to include?',
-    false,
     extraPackageOptions,
     startingOptions: Package.preSelectedByDefault.map((e) => e.name).toList(),
   );
@@ -74,8 +74,8 @@ Future<void> createCommand(ArgResults command) async {
   print('\nYour current directory is: $currentDir');
 
   final createFolder = getOption(
+        isInteractive: interactive,
         command,
-        interactive,
         'create-folder',
         'Do you want to put your project files directly on the current dir, '
             'or do you want to create a folder called $name?',
@@ -88,8 +88,8 @@ Future<void> createCommand(ArgResults command) async {
 
   print('\n');
   final template = getOption(
+    isInteractive: interactive,
     command,
-    interactive,
     'template',
     'What template would you like to use for your new project?',
     Template.templates
