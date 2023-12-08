@@ -125,9 +125,11 @@ Future<void> createCommand(ArgResults command) async {
     'description': 'A simple Flame game.',
     'version': '0.1.0',
     'extra-dependencies': dependencies
+        .sortedBy((e) => e.name)
         .map((package) => package.toMustache(versions, flameVersion))
         .toList(),
     'extra-dev-dependencies': devDependencies
+        .sortedBy((e) => e.name)
         .map((package) => package.toMustache(versions, flameVersion))
         .toList(),
   };
