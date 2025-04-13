@@ -48,7 +48,7 @@ Future<void> mainCommand(List<String> args) async {
     help: 'What Flame version you would like to use.',
     allowed: flameVersions.versions,
   );
-  create.addOption(
+  create.addMultiOption(
     'extra-packages',
     help: 'Which packages to use',
     allowed: packages.keys.map((e) => e.name).toList(),
