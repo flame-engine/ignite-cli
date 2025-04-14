@@ -76,19 +76,15 @@ String getOption(
 }
 
 List<String> _unwrap(dynamic value) {
-  if (value == null) {
-    return [];
-  } else if (value is String) {
-    return [value];
-  } else if (value is List<String>) {
-    return value;
-  } else if (value is List) {
-    return value.map((e) => e.toString()).toList();
-  } else {
-    throw ArgumentError(
+  return switch(value) {
+    null => [],
+    String _ => [value],
+    List<String> _ => value,
+    List _ => value.map((e) => e.toString()).toList(),
+    _ => throw ArgumentError(
       'Invalid type for value (${value.runtimeType}): $value',
-    );
-  }
+    ),
+  };
 }
 
 List<String> getMultiOption(
