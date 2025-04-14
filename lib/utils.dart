@@ -75,6 +75,18 @@ String getOption(
   return value;
 }
 
+List<String> _unwrap(dynamic value) {
+  return switch(value) {
+    null => [],
+    String _ => [value],
+    List<String> _ => value,
+    List _ => value.map((e) => e.toString()).toList(),
+    _ => throw ArgumentError(
+      'Invalid type for value (${value.runtimeType}): $value',
+    ),
+  };
+}
+
 List<String> getMultiOption(
   ArgResults results,
   String name,
@@ -85,7 +97,7 @@ List<String> getMultiOption(
   List<String> startingOptions = const [],
   String? desc,
 }) {
-  var value = results[name] as List<String>? ?? [];
+  var value = _unwrap(results[name]);
   if (!isInteractive) {
     if (value.isEmpty) {
       if (startingOptions.isNotEmpty) {
@@ -94,6 +106,8 @@ List<String> getMultiOption(
         print('Missing parameter $name is required.');
         exit(1);
       }
+    } else {
+      return value;
     }
   }
   if (value.any((e) => !options.contains(e))) {
@@ -103,7 +117,10 @@ List<String> getMultiOption(
   if (desc != null) {
     stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
   }
-  value = cbx(message, options, startingOptions);
+  final selectedOptions = value.isEmpty
+      ? startingOptions
+      : value;
+  value = cbx(message, options, selectedOptions);
   if (desc != null) {
     stdout.write('\r\u{1B}[K');
   }
