@@ -10,13 +10,15 @@ void main() {
   myGame.testGameWidget(
     'game will load its child',
     verify: (game, tester) async {
-      game.update(0.0);
+      await tester.pumpWidget(GameWidget(game: game));
 
-      expect(game.children.length, 1);
-      expect(game.myComponent.speed, Vector2.zero());
+      expect(game.world.children.length, 1);
+      expect(game.world.myComponent.speed, Vector2.zero());
 
       await tester.tapAt(const Offset(10, 10));
-      expect(game.myComponent.speed, isNot(equals(Vector2.zero())));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(game.world.myComponent.speed, isNot(equals(Vector2.zero())));
     },
   );
 }
