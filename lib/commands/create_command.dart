@@ -24,10 +24,11 @@ Future<void> createCommand(ArgResults command) async {
     'Choose a name for your project: ',
     desc: 'Note: this must be a valid dart identifier (no dashes). '
         'For example: my_game',
-    validate: (it) => switch(it) {
+    validate: (it) => switch (it) {
       _ when it.isEmpty => 'Name cannot be empty',
       _ when it.contains('-') => 'Name cannot contain dashes',
-      _ when it == 'test' => 'Name cannot be "test" as it conflicts with the Dart package',
+      _ when it == 'test' => 'Name cannot be "test", '
+          'as it conflicts with the Dart package',
       _ => null,
     },
   );
@@ -40,7 +41,7 @@ Future<void> createCommand(ArgResults command) async {
     desc: 'Note: this is a dot separated list of "packages", '
         'normally in reverse domain notation. '
         'For example: org.flame_engine.games',
-    validate: (it) => switch(it) {
+    validate: (it) => switch (it) {
       _ when it.isEmpty => 'Org cannot be empty',
       _ when it.contains('-') => 'Org cannot contain dashes',
       _ => null,
