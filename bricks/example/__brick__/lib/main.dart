@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 final _rng = Random();
 
 void main() {
-  runApp(GameWidget(game: MyGame()));
+  runApp(const GameWidget.controlled(gameFactory: MyGame.new));
 }
 
 class MyGame extends FlameGame<MyWorld> {
