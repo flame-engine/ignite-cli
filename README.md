@@ -6,6 +6,8 @@
 
 Simple CLI interface for Ignite; scaffold and setup your Flame projects with ease.
 
+![ignite-cli](./media/ignite-example.cast.gif)
+
 
 ## Usage
 
