@@ -17,6 +17,7 @@ String getString(
   String message, {
   required bool isInteractive,
   String? desc,
+  bool Function(String)? validate,
 }) {
   var value = results[name] as String?;
   if (!isInteractive) {
@@ -29,7 +30,7 @@ String getString(
     if (desc != null) {
       stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
-    value = prompts.get(message, validate: (it) => !it.contains('-'));
+    value = prompts.get(message, validate: validate);
     if (desc != null) {
       stdout.write('\r\u{1B}[K');
     }

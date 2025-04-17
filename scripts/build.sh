@@ -1,5 +1,7 @@
 #!/bin/bash -xe
 
+./scripts/generate-version.sh
+
 # TODO(luan): use a wildcard once supported
 function bundle {
     dart run mason_cli:mason bundle $1 -t dart -o lib/templates/bricks/
