@@ -9,42 +9,41 @@ import 'package:flutter/material.dart';
 final _rng = Random();
 
 void main() {
-  runApp(GameWidget(game: MyGame()));
+  runApp(const GameWidget.controlled(gameFactory: MyGame.new));
 }
 
-class MyGame extends FlameGame with TapCallbacks {
+class MyGame extends FlameGame<MyWorld> {
+  MyGame() : super(world: MyWorld());
+}
+
+class MyWorld extends World {
   late final MyComponent myComponent;
 
   @override
   Future<void> onLoad() async {
-    await world.add(myComponent = MyComponent());
+    await add(myComponent = MyComponent());
     return super.onLoad();
-  }
-
-  @override
-  void onTapUp(TapUpEvent event) {
-    myComponent.speed.x = -1 + 2 * _rng.nextDouble();
-    myComponent.speed.y = -1 + 2 * _rng.nextDouble();
   }
 }
 
-class MyComponent extends PositionComponent with HasGameRef<MyGame> {
-  static final _paint = BasicPalette.white.paint();
+class MyComponent extends RectangleComponent with TapCallbacks {
   final Vector2 speed = Vector2.zero();
 
   MyComponent()
-      : super(
+      : super.square(
+          size: 64,
           anchor: Anchor.center,
-          size: Vector2.all(32),
+          paint: BasicPalette.magenta.paint(),
         );
 
   @override
-  void render(Canvas c) {
-    c.drawRect(size.toRect(), _paint);
+  void update(double dt) {
+    position += speed * 128.0 * dt;
   }
 
   @override
-  void update(double dt) {
-    position += speed * 32.0 * dt;
+  void onTapDown(TapDownEvent event) {
+    speed.x = -1 + 2 * _rng.nextDouble();
+    speed.y = -1 + 2 * _rng.nextDouble();
   }
 }
