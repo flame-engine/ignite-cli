@@ -35,18 +35,17 @@ ignite create --interactive=false --name=my_flame_game --org=org.flame-engine.ex
 
 ## Instructions for contributors
 
-Run
+Run:
 
 ```bash
-cd test
-./run.sh
+./scripts/test.sh
 ```
 
 To run all tests. Always make sure the build is green.
 
 You will need to install the bash testing framework [bats](https://bats-core.readthedocs.io/en/stable/installation.html).
 
-In order to run the application locally, run
+In order to run the application locally, use:
 
 ```bash
 dart bin/ignite_cli.dart
