@@ -29,22 +29,20 @@ class MyWorld extends World {
 class MyComponent extends RectangleComponent with TapCallbacks {
   final Vector2 speed = Vector2.zero();
 
-  @override
-  final Paint paint = BasicPalette.magenta.paint();
-
   MyComponent()
       : super.square(
-          size: 32,
+          size: 64,
           anchor: Anchor.center,
+          paint: BasicPalette.magenta.paint(),
         );
 
   @override
   void update(double dt) {
-    position += speed * 32.0 * dt;
+    position += speed * 128.0 * dt;
   }
 
   @override
-  void onTapUp(TapUpEvent event) {
+  void onTapDown(TapDownEvent event) {
     speed.x = -1 + 2 * _rng.nextDouble();
     speed.y = -1 + 2 * _rng.nextDouble();
   }
