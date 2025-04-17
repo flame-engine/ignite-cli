@@ -17,7 +17,7 @@ String getString(
   String message, {
   required bool isInteractive,
   String? desc,
-  bool Function(String)? validate,
+  String? Function(String)? validate,
 }) {
   var value = results[name] as String?;
   if (!isInteractive) {
@@ -25,12 +25,31 @@ String getString(
       print('Missing parameter $name is required.');
       exit(1);
     }
+    final error = validate?.call(value);
+    if (error != null) {
+      print('Invalid value $value provided: $error');
+      exit(1);
+    }
   }
   while (value == null || value.isEmpty) {
     if (desc != null) {
       stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
-    value = prompts.get(message, validate: validate);
+    value = prompts.get(
+      message,
+      validate: (e) {
+        final error = validate?.call(e);
+        if (error != null) {
+          // clear the line
+          stdout.write('\n\r\u{1B}[K');
+          stdout.write(ansi.red.wrap('$error\u{1B}[1A\r'));
+          return false;
+        } else {
+          stdout.write('\n\r\u{1B}[K');
+          return true;
+        }
+      },
+    );
     if (desc != null) {
       stdout.write('\r\u{1B}[K');
     }
@@ -77,14 +96,14 @@ String getOption(
 }
 
 List<String> _unwrap(dynamic value) {
-  return switch(value) {
+  return switch (value) {
     null => [],
     String _ => [value],
     List<String> _ => value,
     List _ => value.map((e) => e.toString()).toList(),
     _ => throw ArgumentError(
-      'Invalid type for value (${value.runtimeType}): $value',
-    ),
+        'Invalid type for value (${value.runtimeType}): $value',
+      ),
   };
 }
 
@@ -118,9 +137,7 @@ List<String> getMultiOption(
   if (desc != null) {
     stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
   }
-  final selectedOptions = value.isEmpty
-      ? startingOptions
-      : value;
+  final selectedOptions = value.isEmpty ? startingOptions : value;
   value = cbx(message, options, selectedOptions);
   if (desc != null) {
     stdout.write('\r\u{1B}[K');
