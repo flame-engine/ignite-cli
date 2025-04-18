@@ -1,7 +1,14 @@
+## 0.6.1
+
+- Update dependencies
+- New and improved example template
+- Fix CLI arguments / interactive mode hiccups
+- Improve parameter validation
+
 ## 0.6.0
 
 - Upgraded to Flame v1.11.0
- 
+
 ## 0.5.0
 
 - Upgraded to mason 0.1.0-dev.34
