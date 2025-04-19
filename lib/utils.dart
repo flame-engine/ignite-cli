@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:io/ansi.dart' as ansi;
+import 'package:io/io.dart';
 import 'package:mason_logger/mason_logger.dart' as logger;
 import 'package:path/path.dart' as p;
 
@@ -22,25 +23,26 @@ String getString(
   var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null || value.isEmpty) {
-      print('Missing parameter $name is required.');
-      exit(1);
+      logger.err('Missing parameter $name is required.');
+      exit(ExitCode.usage.code);
     }
     final error = validate?.call(value);
     if (error != null) {
-      print('Invalid value $value provided: $error');
-      exit(1);
+      logger.err('Invalid value $value provided: $error');
+      exit(ExitCode.usage.code);
     }
   }
   while (value == null || value.isEmpty) {
     if (desc != null) {
-      stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
+      logger.info(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
 
     value = logger.prompt(message);
 
     // TODO(elijah): validation callback
+
     if (desc != null) {
-      stdout.write('\r\u{1B}[K');
+      logger.info('\r\u{1B}[K');
     }
   }
   return value;
@@ -64,27 +66,27 @@ String getOption(
       if (defaultsTo != null) {
         return defaultsTo;
       } else {
-        print('Missing parameter $name is required.');
-        exit(1);
+        logger.err('Missing parameter $name is required.');
+        exit(ExitCode.usage.code);
       }
     }
   }
   final fullValues = {...options, ...fullOptions}.values;
   if (value != null && !fullValues.contains(value)) {
-    print('Invalid value $value provided. Must be in: ${options.values}');
+    logger.err('Invalid value $value provided. Must be in: ${options.values}');
     value = null;
   }
 
   while (value == null) {
     if (desc != null) {
-      stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
+      logger.info(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
 
     final option = logger.chooseOne(message, choices: options.keys.toList());
     value = options[option];
 
     if (desc != null) {
-      stdout.write('\r\u{1B}[K');
+      logger.info('\r\u{1B}[K');
     }
   }
   return value;
@@ -119,8 +121,8 @@ List<String> getMultiOption(
       if (startingOptions.isNotEmpty) {
         return startingOptions;
       } else {
-        print('Missing parameter $name is required.');
-        exit(1);
+        logger.err('Missing parameter $name is required.');
+        exit(ExitCode.usage.code);
       }
     } else {
       return value;
@@ -128,17 +130,17 @@ List<String> getMultiOption(
   }
 
   if (value.any((e) => !options.contains(e))) {
-    print('Invalid value $value provided. Must be in: $options');
+    logger.err('Invalid value $value provided. Must be in: $options');
     value = [];
   }
   if (desc != null) {
-    stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
+    logger.info(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
   }
 
   value = logger.chooseAny(message, choices: options);
 
   if (desc != null) {
-    stdout.write('\r\u{1B}[K');
+    logger.info('\r\u{1B}[K');
   }
   return value;
 }
