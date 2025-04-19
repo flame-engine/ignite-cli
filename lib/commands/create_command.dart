@@ -9,9 +9,8 @@ import 'package:io/ansi.dart' as ansi;
 import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
-Future<void> createCommand(ArgResults command) async {
+Future<void> createCommand(ArgResults command, Logger logger) async {
   final interactive = command['interactive'] != 'false';
-  final logger = Logger();
 
   if (interactive) {
     stdout.write('\nWelcome to ${ansi.red.wrap('Ignite CLI')}! 🔥\n');

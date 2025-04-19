@@ -3,11 +3,14 @@ import 'package:completion/completion.dart' as completion;
 import 'package:ignite_cli/commands/create_command.dart';
 import 'package:ignite_cli/commands/version_command.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
+import 'package:mason_logger/mason_logger.dart';
 
 Future<void> mainCommand(List<String> args) async {
   await FlameVersionManager.init();
 
   final parser = ArgParser();
+  final logger = Logger();
+
   parser.addFlag('help', abbr: 'h', help: 'Displays this message.');
   parser.addFlag('version', abbr: 'v', help: 'Shows relevant version info.');
 
@@ -56,22 +59,24 @@ Future<void> mainCommand(List<String> args) async {
 
   final results = completion.tryArgsCompletion(args, parser);
   if (results['help'] as bool) {
-    print(parser.usage);
-    print('');
-    print('List of available commands:');
-    print('');
-    print('create:');
-    print('  ${create.usage}');
+    logger.info(parser.usage);
+    logger.info('');
+    logger.info('List of available commands:');
+    logger.info('');
+    logger.info('create:');
+    logger.info('  ${create.usage}');
     return;
   } else if (results['version'] as bool) {
-    await versionCommand();
+    await versionCommand(logger);
     return;
   }
 
   final command = results.command;
   if (command?.name == 'create') {
-    await createCommand(command!);
+    await createCommand(command!, logger);
   } else {
-    print('Invalid command. Please select an option, use --help for help.');
+    logger.err(
+      'Invalid command. Please select an option, use --help for help.',
+    );
   }
 }
