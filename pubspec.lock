@@ -306,7 +306,7 @@ packages:
     source: hosted
     version: "0.1.2"
   mason_logger:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mason_logger
       sha256: "6d5a989ff41157915cb5162ed6e41196d5e31b070d2f86e1c2edf216996a158c"
@@ -409,14 +409,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.4"
-  prompts:
-    dependency: "direct main"
-    description:
-      name: prompts
-      sha256: "3773b845e85a849f01e793c4fc18a45d52d7783b4cb6c0569fad19f9d0a774a1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   pub_semver:
     dependency: transitive
     description:

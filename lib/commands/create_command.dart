@@ -11,6 +11,7 @@ import 'package:process_run/process_run.dart';
 
 Future<void> createCommand(ArgResults command) async {
   final interactive = command['interactive'] != 'false';
+  final logger = Logger();
 
   if (interactive) {
     stdout.write('\nWelcome to ${ansi.red.wrap('Ignite CLI')}! 🔥\n');
@@ -19,6 +20,7 @@ Future<void> createCommand(ArgResults command) async {
 
   final name = getString(
     isInteractive: interactive,
+    logger: logger,
     command,
     'name',
     'Choose a name for your project: ',
@@ -34,6 +36,7 @@ Future<void> createCommand(ArgResults command) async {
   );
 
   final org = getString(
+    logger: logger,
     isInteractive: interactive,
     command,
     'org',
@@ -51,6 +54,7 @@ Future<void> createCommand(ArgResults command) async {
   final versions = FlameVersionManager.singleton.versions;
   final flameVersions = versions[Package.flame]!;
   final flameVersion = getOption(
+    logger: logger,
     isInteractive: interactive,
     command,
     'flame-version',
@@ -65,6 +69,7 @@ Future<void> createCommand(ArgResults command) async {
       .map((key) => key.name)
       .toList();
   final extraPackages = getMultiOption(
+    logger: logger,
     isInteractive: interactive,
     isRequired: false,
     command,
@@ -86,6 +91,7 @@ Future<void> createCommand(ArgResults command) async {
   print('\nYour current directory is: $currentDir');
 
   final createFolder = getOption(
+        logger: logger,
         isInteractive: interactive,
         command,
         'create-folder',
@@ -100,6 +106,7 @@ Future<void> createCommand(ArgResults command) async {
 
   print('\n');
   final template = getOption(
+    logger: logger,
     isInteractive: interactive,
     command,
     'template',

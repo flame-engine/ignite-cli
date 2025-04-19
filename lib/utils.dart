@@ -1,10 +1,9 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:charcode/ascii.dart' as ascii;
 import 'package:io/ansi.dart' as ansi;
+import 'package:mason_logger/mason_logger.dart' as logger;
 import 'package:path/path.dart' as p;
-import 'package:prompts/prompts.dart' as prompts;
 
 String getBundledFile(String name) {
   final binFolder = p.dirname(p.fromUri(Platform.script));
@@ -16,6 +15,7 @@ String getString(
   String name,
   String message, {
   required bool isInteractive,
+  required logger.Logger logger,
   String? desc,
   String? Function(String)? validate,
 }) {
@@ -35,21 +35,10 @@ String getString(
     if (desc != null) {
       stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
-    value = prompts.get(
-      message,
-      validate: (e) {
-        final error = validate?.call(e);
-        if (error != null) {
-          // clear the line
-          stdout.write('\n\r\u{1B}[K');
-          stdout.write(ansi.red.wrap('$error\u{1B}[1A\r'));
-          return false;
-        } else {
-          stdout.write('\n\r\u{1B}[K');
-          return true;
-        }
-      },
-    );
+
+    value = logger.prompt(message);
+
+    // TODO(elijah): validation callback
     if (desc != null) {
       stdout.write('\r\u{1B}[K');
     }
@@ -63,11 +52,13 @@ String getOption(
   String message,
   Map<String, String> options, {
   required bool isInteractive,
+  required logger.Logger logger,
   String? desc,
   String? defaultsTo,
   Map<String, String> fullOptions = const {},
 }) {
   var value = results[name] as String?;
+
   if (!isInteractive) {
     if (value == null) {
       if (defaultsTo != null) {
@@ -83,11 +74,15 @@ String getOption(
     print('Invalid value $value provided. Must be in: ${options.values}');
     value = null;
   }
+
   while (value == null) {
     if (desc != null) {
       stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
-    value = options[prompts.choose(message, options.keys)];
+
+    final option = logger.chooseOne(message, choices: options.keys.toList());
+    value = options[option];
+
     if (desc != null) {
       stdout.write('\r\u{1B}[K');
     }
@@ -114,6 +109,7 @@ List<String> getMultiOption(
   List<String> options, {
   required bool isInteractive,
   required bool isRequired,
+  required logger.Logger logger,
   List<String> startingOptions = const [],
   String? desc,
 }) {
@@ -130,6 +126,7 @@ List<String> getMultiOption(
       return value;
     }
   }
+
   if (value.any((e) => !options.contains(e))) {
     print('Invalid value $value provided. Must be in: $options');
     value = [];
@@ -137,90 +134,13 @@ List<String> getMultiOption(
   if (desc != null) {
     stdout.write(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
   }
-  final selectedOptions = value.isEmpty ? startingOptions : value;
-  value = cbx(message, options, selectedOptions);
+
+  value = logger.chooseAny(message, choices: options);
+
   if (desc != null) {
     stdout.write('\r\u{1B}[K');
   }
   return value;
-}
-
-List<String> cbx(
-  String message,
-  List<String> keys,
-  List<String> startingKeys,
-) {
-  final selected = startingKeys;
-  var hereIdx = 0;
-
-  var needsClear = false;
-  void writeIt() {
-    if (needsClear) {
-      for (var i = 0; i <= keys.length; i++) {
-        prompts.goUpOneLine();
-        prompts.clearLine();
-      }
-    } else {
-      needsClear = true;
-    }
-    print(message);
-    keys.asMap().forEach((index, option) {
-      final isSelected = selected.contains(option);
-      final isHere = index == hereIdx;
-      final text = ' ${isSelected ? '♦' : '♢'} $option';
-      final color = isHere ? ansi.cyan : ansi.darkGray;
-      print(color.wrap(text));
-    });
-  }
-
-  final oldEchoMode = stdin.echoMode;
-  final oldLineMode = stdin.lineMode;
-  while (true) {
-    int ch;
-    writeIt();
-
-    try {
-      stdin.lineMode = stdin.echoMode = false;
-      ch = stdin.readByteSync();
-
-      if (ch == ascii.$esc) {
-        ch = stdin.readByteSync();
-        if (ch == ascii.$lbracket) {
-          ch = stdin.readByteSync();
-          if (ch == ascii.$A) {
-            // Up key
-            hereIdx--;
-            if (hereIdx < 0) {
-              hereIdx = keys.length - 1;
-            }
-            writeIt();
-          } else if (ch == ascii.$B) {
-            // Down key
-            hereIdx++;
-            if (hereIdx >= keys.length) {
-              hereIdx = 0;
-            }
-            writeIt();
-          }
-        }
-      } else if (ch == ascii.$lf) {
-        // Enter key pressed - submit
-        return selected;
-      } else if (ch == ascii.$space) {
-        // Space key pressed - selected/unselect
-        final key = keys[hereIdx];
-        if (selected.contains(key)) {
-          selected.remove(key);
-        } else {
-          selected.add(key);
-        }
-        writeIt();
-      }
-    } finally {
-      stdin.lineMode = oldLineMode;
-      stdin.echoMode = oldEchoMode;
-    }
-  }
 }
 
 extension SortedBy<T> on Iterable<T> {
