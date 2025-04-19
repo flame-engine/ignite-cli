@@ -75,7 +75,7 @@ Future<void> mainCommand(List<String> args) async {
   if (command?.name == 'create') {
     await createCommand(command!, logger);
   } else {
-    logger.err(
+    logger.info(
       'Invalid command. Please select an option, use --help for help.',
     );
   }

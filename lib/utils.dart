@@ -23,12 +23,12 @@ String getString(
   var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null || value.isEmpty) {
-      logger.err('Missing parameter $name is required.');
+      logger.info('Missing parameter $name is required.');
       exit(ExitCode.usage.code);
     }
     final error = validate?.call(value);
     if (error != null) {
-      logger.err('Invalid value $value provided: $error');
+      logger.info('Invalid value $value provided: $error');
       exit(ExitCode.usage.code);
     }
   }
@@ -66,14 +66,14 @@ String getOption(
       if (defaultsTo != null) {
         return defaultsTo;
       } else {
-        logger.err('Missing parameter $name is required.');
+        logger.info('Missing parameter $name is required.');
         exit(ExitCode.usage.code);
       }
     }
   }
   final fullValues = {...options, ...fullOptions}.values;
   if (value != null && !fullValues.contains(value)) {
-    logger.err('Invalid value $value provided. Must be in: ${options.values}');
+    logger.info('Invalid value $value provided. Must be in: ${options.values}');
     value = null;
   }
 
@@ -121,7 +121,7 @@ List<String> getMultiOption(
       if (startingOptions.isNotEmpty) {
         return startingOptions;
       } else {
-        logger.err('Missing parameter $name is required.');
+        logger.info('Missing parameter $name is required.');
         exit(ExitCode.usage.code);
       }
     } else {
@@ -130,7 +130,7 @@ List<String> getMultiOption(
   }
 
   if (value.any((e) => !options.contains(e))) {
-    logger.err('Invalid value $value provided. Must be in: $options');
+    logger.info('Invalid value $value provided. Must be in: $options');
     value = [];
   }
   if (desc != null) {
