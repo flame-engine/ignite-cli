@@ -29,10 +29,11 @@ class IgniteCommandRunner extends CommandRunner<ExitCode> {
     );
   }
 
-  /// Forces commands added to [IgniteCommandRunner]
-  /// to use the [IgniteCommand] mixin on those commands.
   @override
-  void addCommand(covariant IgniteCommand<ExitCode> command) {
+  void addCommand(Command<ExitCode> command) {
+    if (command is IgniteCommand) {
+      command.context = context;
+    }
     super.addCommand(command);
   }
 

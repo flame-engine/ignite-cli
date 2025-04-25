@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:args/command_runner.dart';
 import 'package:dartlin/dartlin.dart';
 import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
@@ -10,16 +9,9 @@ import 'package:ignite_cli/utils.dart';
 import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
-class SubCommand extends Command<ExitCode> {
+class CreateCommand extends IgniteCommand {
   @override
-  String get description => throw UnimplementedError();
-
-  @override
-  String get name => throw UnimplementedError();
-}
-
-class CreateCommand extends Command<ExitCode> with IgniteCommand {
-  CreateCommand() {
+  void setup(ArgParser argParser) {
     final packages = context.flameVersionManager.versions;
     final flameVersions = packages[Package.flame]!;
 
