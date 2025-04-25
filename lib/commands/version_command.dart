@@ -3,10 +3,30 @@ import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
 Future<void> versionCommand(Logger logger) async {
-  logger.detail(r'$ ignite --version:');
-  logger.detail(igniteVersion);
-  logger.detail('');
-  await runExecutableArguments('dart', ['--version'], verbose: true);
-  logger.detail('');
-  await runExecutableArguments('flutter', ['--version'], verbose: true);
+  logger.info('ignite --version: $igniteVersion\n');
+
+  final [dartProcess, flutterProcess] = await [
+    runExecutableArguments(
+      'dart',
+      ['--version'],
+      commandVerbose: false,
+      verbose: false,
+    ),
+    runExecutableArguments(
+      'flutter',
+      ['--version'],
+      commandVerbose: false,
+      verbose: false,
+    ),
+  ].wait;
+
+  logger.info('${dartProcess.stdout}');
+  logger.info('${flutterProcess.stdout}');
+
+  if (dartProcess.stderr case final String err when err.isNotEmpty) {
+    logger.err(err);
+  }
+  if (flutterProcess.stderr case final String err when err.isNotEmpty) {
+    logger.err(err);
+  }
 }

@@ -2,7 +2,7 @@ include: package:flame_lint/analysis_options.yaml
 
 linter:
   rules:
-    avoid_print: false # since it is a CLI application
+    avoid_print: true # should always use a Logger
 
 analyzer:
   exclude:

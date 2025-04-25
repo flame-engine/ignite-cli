@@ -10,52 +10,50 @@ import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
 class CreateCommand extends IgniteCommand {
-  @override
-  void setup(ArgParser argParser) {
+  CreateCommand(super.context) {
     final packages = context.flameVersionManager.versions;
     final flameVersions = packages[Package.flame]!;
 
-    argParser
-      ..addFlag(
-        'interactive',
-        abbr: 'i',
-        help: 'Whether to run in interactive mode or not.',
-        defaultsTo: true,
-      )
-      ..addOption(
-        'name',
-        help: 'The name of your game (valid dart identifier).',
-      )
-      ..addOption(
-        'org',
-        help: 'The org name, in reverse domain notation '
-            '(package name/bundle identifier).',
-      )
-      ..addFlag(
-        'create-folder',
-        abbr: 'f',
-        help: 'If you want to create a new folder on the current location with '
-            "the project name or if you are already on the new project's folder.",
-      )
-      ..addOption(
-        'template',
-        help: 'What Flame template you would like to use for your new project',
-        allowed: ['simple', 'example'],
-      )
-      ..addOption(
-        'flame-version',
-        help: 'What Flame version you would like to use.',
-        allowed: [
-          ...flameVersions.versions.take(5),
-          '...',
-          flameVersions.versions.last,
-        ],
-      )
-      ..addMultiOption(
-        'extra-packages',
-        help: 'Which packages to use',
-        allowed: packages.keys.map((e) => e.name).toList(),
-      );
+    argParser.addFlag(
+      'interactive',
+      abbr: 'i',
+      help: 'Whether to run in interactive mode or not.',
+      defaultsTo: true,
+    );
+    argParser.addOption(
+      'name',
+      help: 'The name of your game (valid dart identifier).',
+    );
+    argParser.addOption(
+      'org',
+      help: 'The org name, in reverse domain notation '
+          '(package name/bundle identifier).',
+    );
+    argParser.addFlag(
+      'create-folder',
+      abbr: 'f',
+      help: 'If you want to create a new folder on the current location with '
+          "the project name or if you are already on the new project's folder.",
+    );
+    argParser.addOption(
+      'template',
+      help: 'What Flame template you would like to use for your new project',
+      allowed: ['simple', 'example'],
+    );
+    argParser.addOption(
+      'flame-version',
+      help: 'What Flame version you would like to use.',
+      allowed: [
+        ...flameVersions.versions.take(5),
+        '...',
+        flameVersions.versions.last,
+      ],
+    );
+    argParser.addMultiOption(
+      'extra-packages',
+      help: 'Which packages to use',
+      allowed: packages.keys.map((e) => e.name).toList(),
+    );
   }
 
   @override
@@ -67,7 +65,6 @@ class CreateCommand extends IgniteCommand {
   @override
   Future<ExitCode> run() async {
     final argResults = this.argResults;
-    context.logger.write('$argResults');
     if (argResults == null) {
       return ExitCode.usage;
     }
@@ -92,7 +89,7 @@ Future<void> createCommand(
   if (interactive) {
     logger
       ..info('\nWelcome to ${red.wrap('Ignite CLI')}! 🔥')
-      ..info("Let's create a new project!\n\n");
+      ..info("Let's create a new project!\n");
   }
 
   final name = getString(
@@ -100,7 +97,7 @@ Future<void> createCommand(
     logger: logger,
     command,
     'name',
-    'Choose a name for your project: ',
+    'Choose a name for your project',
     desc: 'Note: this must be a valid dart identifier (no dashes). '
         'For example: my_game',
     validate: (it) => switch (it) {
@@ -165,7 +162,7 @@ Future<void> createCommand(
   final devDependencies = packages.where((e) => e.isDevDependency);
 
   final currentDir = Directory.current.path;
-  print('\nYour current directory is: $currentDir');
+  logger.info('\nYour current directory is: $currentDir');
 
   final createFolder = getOption(
         logger: logger,
@@ -181,7 +178,7 @@ Future<void> createCommand(
       ) ==
       'true';
 
-  print('\n');
+  logger.info('\n');
   final template = getOption(
     logger: logger,
     isInteractive: interactive,
@@ -196,26 +193,26 @@ Future<void> createCommand(
   if (createFolder) {
     await runExecutableArguments('mkdir', [actualDir]);
   }
-  print('\nRunning flutter create on $actualDir ...');
+  logger.info('\nRunning flutter create on $actualDir ...');
 
   await runExecutableArguments(
     'flutter',
     'create --org $org --project-name $name .'.split(' '),
     workingDirectory: actualDir,
-    verbose: true,
+    verbose: logger.level == Level.verbose,
   );
+
   await runExecutableArguments(
     'rm',
     '-rf lib test'.split(' '),
     workingDirectory: actualDir,
-    verbose: true,
+    verbose: logger.level == Level.verbose,
   );
 
   final bundle = Template.byKey(template).bundle;
   final generator = await MasonGenerator.fromBundle(bundle);
-  final target = DirectoryGeneratorTarget(
-    Directory(actualDir),
-  );
+  final target = DirectoryGeneratorTarget(Directory(actualDir));
+
   final variables = <String, dynamic>{
     'name': name,
     'description': 'A simple Flame game.',
@@ -237,16 +234,17 @@ Future<void> createCommand(
       'rm',
       '-rf test'.split(' '),
       workingDirectory: actualDir,
-      verbose: true,
+      verbose: logger.level == Level.verbose,
     );
   }
+
   await runExecutableArguments(
     'flutter',
     'pub get'.split(' '),
     workingDirectory: actualDir,
-    verbose: true,
+    verbose: logger.level == Level.verbose,
   );
 
-  print('Updated ${files.length} files on top of flutter create.\n');
-  print('Your new Flame project was successfully created!');
+  // logger.info('Updated ${files.length} files on top of flutter create.\n');
+  logger.info('Your new Flame project was successfully created!');
 }

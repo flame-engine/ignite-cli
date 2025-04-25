@@ -1,26 +1,14 @@
 import 'dart:async';
 
-import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:mason/mason.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 abstract class IgniteCommand extends Command<ExitCode> {
-  late IgniteContext context;
+  final IgniteContext context;
 
-  void setup(ArgParser argParser);
-
-  @override
-  void addSubcommand(Command<ExitCode> command) {
-    if (command is IgniteCommand) {
-      command
-        ..context = context
-        ..setup(command.argParser);
-    }
-
-    super.addSubcommand(command);
-  }
+  IgniteCommand(this.context);
 
   @override
   Future<ExitCode> run();

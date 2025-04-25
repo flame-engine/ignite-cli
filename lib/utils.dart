@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:args/args.dart';
+import 'package:args/args.dart' show ArgResults;
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 
@@ -18,7 +18,7 @@ String getString(
   String? desc,
   String? Function(String)? validate,
 }) {
-  final value = results[name] as String?;
+  var value = results[name] as String?;
   if (!isInteractive) {
     if (value == null || value.isEmpty) {
       logger.err('Missing parameter $name is required.');
@@ -31,14 +31,27 @@ String getString(
     }
   }
 
-  desc = darkGray.wrap(desc);
-  var msg = message;
+  String? validation;
 
-  if (desc != null) {
-    msg = '$msg\n$desc';
-  }
+  do {
+    desc = darkGray.wrap(desc);
+    var msg = message;
 
-  return logger.prompt(msg);
+    if (desc != null) {
+      msg = '$msg ($desc)';
+    }
+
+    if (validation != null) {
+      validation = logger.theme.warn(validation);
+      // omit the description on errors?
+      msg = '$message [$validation]';
+    }
+
+    value = logger.prompt(msg);
+    validation = validate?.call(value);
+  } while (validation != null);
+
+  return value;
 }
 
 String getOption(
@@ -52,7 +65,7 @@ String getOption(
   String? defaultsTo,
   Map<String, String> fullOptions = const {},
 }) {
-  var value = results[name] as String?;
+  var value = results[name];
 
   if (!isInteractive) {
     if (value == null) {
@@ -82,7 +95,11 @@ String getOption(
       logger.info('\r\u{1B}[K');
     }
   }
-  return value;
+  return switch (value) {
+    final String value => value,
+    final bool value => 'true',
+    _ => '',
+  };
 }
 
 List<String> _unwrap(dynamic value) {

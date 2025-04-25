@@ -9,18 +9,22 @@ import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class IgniteCommandRunner extends CommandRunner<ExitCode> {
-  late final IgniteContext context;
+  late IgniteContext context;
 
   IgniteCommandRunner({
     required Logger logger,
     required FlameVersionManager flameVersionManager,
-  }) : super(_name, _description) {
+  }) : super('ignite', _description) {
     context = IgniteContext(
       logger: logger,
       flameVersionManager: flameVersionManager,
     );
 
-    addCommand(CreateCommand());
+    addCommand(CreateCommand(context));
+
+    argParser.addFlag(
+      'verbose',
+    );
 
     argParser.addFlag(
       'version',
@@ -30,17 +34,13 @@ class IgniteCommandRunner extends CommandRunner<ExitCode> {
   }
 
   @override
-  void addCommand(Command<ExitCode> command) {
-    if (command is IgniteCommand) {
-      command.context = context;
-    }
-    super.addCommand(command);
-  }
-
-  @override
   Future<ExitCode> run(Iterable<String> args) async {
     try {
       final parsedArgs = parse(args);
+
+      if (parsedArgs['verbose'] == true) {
+        context.logger.level = Level.verbose;
+      }
 
       if (parsedArgs['version'] == true) {
         await versionCommand(context.logger);
@@ -69,7 +69,6 @@ class IgniteCommandRunner extends CommandRunner<ExitCode> {
     }
   }
 
-  static const _name = 'ignite';
   static const _description = 'Ignite your projects with flame; '
       'a CLI scaffolding tool to create and setup your Flame projects.';
 }
