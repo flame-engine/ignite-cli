@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:io/ansi.dart' as ansi;
-import 'package:io/io.dart';
-import 'package:mason_logger/mason_logger.dart' as logger;
+import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 
 String getBundledFile(String name) {
@@ -16,36 +14,31 @@ String getString(
   String name,
   String message, {
   required bool isInteractive,
-  required logger.Logger logger,
+  required Logger logger,
   String? desc,
   String? Function(String)? validate,
 }) {
-  var value = results[name] as String?;
+  final value = results[name] as String?;
   if (!isInteractive) {
     if (value == null || value.isEmpty) {
-      logger.info('Missing parameter $name is required.');
+      logger.err('Missing parameter $name is required.');
       exit(ExitCode.usage.code);
     }
     final error = validate?.call(value);
     if (error != null) {
-      logger.info('Invalid value $value provided: $error');
+      logger.err('Invalid value $value provided: $error');
       exit(ExitCode.usage.code);
     }
   }
-  while (value == null || value.isEmpty) {
-    if (desc != null) {
-      logger.info(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
-    }
 
-    value = logger.prompt(message);
+  desc = darkGray.wrap(desc);
+  var msg = message;
 
-    // TODO(elijah): validation callback
-
-    if (desc != null) {
-      logger.info('\r\u{1B}[K');
-    }
+  if (desc != null) {
+    msg = '$msg\n$desc';
   }
-  return value;
+
+  return logger.prompt(msg);
 }
 
 String getOption(
@@ -54,7 +47,7 @@ String getOption(
   String message,
   Map<String, String> options, {
   required bool isInteractive,
-  required logger.Logger logger,
+  required Logger logger,
   String? desc,
   String? defaultsTo,
   Map<String, String> fullOptions = const {},
@@ -79,7 +72,7 @@ String getOption(
 
   while (value == null) {
     if (desc != null) {
-      logger.info(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
+      logger.info(darkGray.wrap('\n$desc\u{1B}[1A\r'));
     }
 
     final option = logger.chooseOne(message, choices: options.keys.toList());
@@ -111,7 +104,7 @@ List<String> getMultiOption(
   List<String> options, {
   required bool isInteractive,
   required bool isRequired,
-  required logger.Logger logger,
+  required Logger logger,
   List<String> startingOptions = const [],
   String? desc,
 }) {
@@ -134,7 +127,7 @@ List<String> getMultiOption(
     value = [];
   }
   if (desc != null) {
-    logger.info(ansi.darkGray.wrap('\n$desc\u{1B}[1A\r'));
+    logger.info(darkGray.wrap('\n$desc\u{1B}[1A\r'));
   }
 
   value = logger.chooseAny(message, choices: options);

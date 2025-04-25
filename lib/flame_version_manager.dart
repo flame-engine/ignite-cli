@@ -3,11 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class FlameVersionManager {
-  static late FlameVersionManager singleton;
-
-  static Future<void> init() async {
-    singleton = await FlameVersionManager.fetch();
-  }
+  static Future<FlameVersionManager> init() => FlameVersionManager.fetch();
 
   final Map<Package, Versions> versions;
 

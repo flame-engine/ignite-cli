@@ -1,20 +1,98 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:args/command_runner.dart';
 import 'package:dartlin/dartlin.dart';
+import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:ignite_cli/templates/template.dart';
 import 'package:ignite_cli/utils.dart';
-import 'package:io/ansi.dart' as ansi;
 import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
-Future<void> createCommand(ArgResults command, Logger logger) async {
+class CreateCommand extends Command<ExitCode> with ContextProvider {
+  CreateCommand() {
+    final packages = context.flameVersionManager.versions;
+    final flameVersions = packages[Package.flame]!;
+
+    argParser
+      ..addFlag(
+        'interactive',
+        abbr: 'i',
+        help: 'Whether to run in interactive mode or not.',
+        defaultsTo: true,
+      )
+      ..addOption(
+        'name',
+        help: 'The name of your game (valid dart identifier).',
+      )
+      ..addOption(
+        'org',
+        help: 'The org name, in reverse domain notation '
+            '(package name/bundle identifier).',
+      )
+      ..addFlag(
+        'create-folder',
+        abbr: 'f',
+        help: 'If you want to create a new folder on the current location with '
+            "the project name or if you are already on the new project's folder.",
+      )
+      ..addOption(
+        'template',
+        help: 'What Flame template you would like to use for your new project',
+        allowed: ['simple', 'example'],
+      )
+      ..addOption(
+        'flame-version',
+        help: 'What Flame version you would like to use.',
+        allowed: [
+          ...flameVersions.versions.take(5),
+          '...',
+          flameVersions.versions.last,
+        ],
+      )
+      ..addMultiOption(
+        'extra-packages',
+        help: 'Which packages to use',
+        allowed: packages.keys.map((e) => e.name).toList(),
+      );
+  }
+
+  @override
+  String get description => 'Create a new Flame project';
+
+  @override
+  String get name => 'create';
+
+  @override
+  Future<ExitCode> run() async {
+    final argResults = this.argResults;
+    context.logger.write('$argResults');
+    if (argResults == null) {
+      return ExitCode.usage;
+    }
+
+    await createCommand(
+      context.logger,
+      argResults,
+      context.flameVersionManager,
+    );
+
+    return ExitCode.success;
+  }
+}
+
+Future<void> createCommand(
+  Logger logger,
+  ArgResults command,
+  FlameVersionManager flameVersionManager,
+) async {
   final interactive = command['interactive'] != 'false';
 
   if (interactive) {
-    stdout.write('\nWelcome to ${ansi.red.wrap('Ignite CLI')}! 🔥\n');
-    stdout.write("Let's create a new project!\n\n");
+    logger
+      ..info('\nWelcome to ${red.wrap('Ignite CLI')}! 🔥')
+      ..info("Let's create a new project!\n\n");
   }
 
   final name = getString(
@@ -50,7 +128,7 @@ Future<void> createCommand(ArgResults command, Logger logger) async {
     },
   );
 
-  final versions = FlameVersionManager.singleton.versions;
+  final versions = flameVersionManager.versions;
   final flameVersions = versions[Package.flame]!;
   final flameVersion = getOption(
     logger: logger,
@@ -63,7 +141,7 @@ Future<void> createCommand(ArgResults command, Logger logger) async {
     fullOptions: flameVersions.versions.associateWith((e) => e),
   );
 
-  final extraPackageOptions = FlameVersionManager.singleton.versions.keys
+  final extraPackageOptions = flameVersionManager.versions.keys
       .where((key) => !Package.includedByDefault.contains(key))
       .map((key) => key.name)
       .toList();

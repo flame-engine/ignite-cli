@@ -1,82 +1,73 @@
-import 'package:args/args.dart';
-import 'package:completion/completion.dart' as completion;
+import 'dart:async';
+import 'dart:io';
+
+import 'package:args/command_runner.dart';
 import 'package:ignite_cli/commands/create_command.dart';
+import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/commands/version_command.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:mason_logger/mason_logger.dart';
 
-Future<void> mainCommand(List<String> args) async {
-  await FlameVersionManager.init();
+class IgniteCommandRunner extends CommandRunner<ExitCode> {
+  late final IgniteContext context;
 
-  final parser = ArgParser();
-  final logger = Logger();
+  IgniteCommandRunner({
+    required Logger logger,
+    required FlameVersionManager flameVersionManager,
+  }) : super(_name, _description) {
+    context = IgniteContext(
+      logger: logger,
+      flameVersionManager: flameVersionManager,
+    );
 
-  parser.addFlag('help', abbr: 'h', help: 'Displays this message.');
-  parser.addFlag('version', abbr: 'v', help: 'Shows relevant version info.');
+    addCommand(CreateCommand());
 
-  final create = parser.addCommand('create');
-  create.addOption(
-    'interactive',
-    abbr: 'i',
-    help: 'Whether to run in interactive mode or not.',
-    allowed: ['true', 'false'],
-    defaultsTo: 'true',
-  );
-  create.addOption(
-    'name',
-    help: 'The name of your game (valid dart identifier).',
-  );
-  create.addOption(
-    'org',
-    help: 'The org name, in reverse domain notation '
-        '(package name/bundle identifier).',
-  );
-  create.addOption(
-    'create-folder',
-    abbr: 'f',
-    help: 'If you want to create a new folder on the current location with '
-        "the project name or if you are already on the new project's folder.",
-    allowed: ['true', 'false'],
-  );
-  create.addOption(
-    'template',
-    help: 'What Flame template you would like to use for your new project',
-    allowed: ['simple', 'example'],
-  );
-
-  final packages = FlameVersionManager.singleton.versions;
-  final flameVersions = packages[Package.flame]!;
-  create.addOption(
-    'flame-version',
-    help: 'What Flame version you would like to use.',
-    allowed: flameVersions.versions,
-  );
-  create.addMultiOption(
-    'extra-packages',
-    help: 'Which packages to use',
-    allowed: packages.keys.map((e) => e.name).toList(),
-  );
-
-  final results = completion.tryArgsCompletion(args, parser);
-  if (results['help'] as bool) {
-    logger.info(parser.usage);
-    logger.info('');
-    logger.info('List of available commands:');
-    logger.info('');
-    logger.info('create:');
-    logger.info('  ${create.usage}');
-    return;
-  } else if (results['version'] as bool) {
-    await versionCommand(logger);
-    return;
-  }
-
-  final command = results.command;
-  if (command?.name == 'create') {
-    await createCommand(command!, logger);
-  } else {
-    logger.info(
-      'Invalid command. Please select an option, use --help for help.',
+    argParser.addFlag(
+      'version',
+      help: 'Print the current version.',
+      negatable: false,
     );
   }
+
+  @override
+  void addCommand(covariant ContextProvider<ExitCode> command) {
+    // forces commands to use the [ContextProvider] mixin on any new commands
+    super.addCommand(command);
+  }
+
+  @override
+  Future<ExitCode> run(Iterable<String> args) async {
+    try {
+      final parsedArgs = parse(args);
+
+      if (parsedArgs['version'] == true) {
+        await versionCommand(context.logger);
+        return ExitCode.success;
+      }
+
+      return await runCommand(parsedArgs) ?? ExitCode.success;
+    } on FormatException catch (exception) {
+      context.logger
+        ..err(exception.message)
+        ..info('')
+        ..info(usage);
+      return ExitCode.usage;
+    } on UsageException catch (exception) {
+      context.logger
+        ..err(exception.message)
+        ..info('')
+        ..info(exception.usage);
+      return ExitCode.usage;
+    } on ProcessException catch (error) {
+      context.logger.err(error.message);
+      return ExitCode.unavailable;
+    } on Exception catch (error) {
+      context.logger.err('$error');
+      return ExitCode.software;
+    }
+  }
+
+  static const _name = 'ignite';
+  static const _description = 'Ignite your projects with flame; '
+      'a CLI scaffolding tool to create and setup your Flame projects.';
 }
