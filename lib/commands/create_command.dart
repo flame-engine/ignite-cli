@@ -10,7 +10,15 @@ import 'package:ignite_cli/utils.dart';
 import 'package:mason/mason.dart';
 import 'package:process_run/process_run.dart';
 
-class CreateCommand extends Command<ExitCode> with ContextProvider {
+class SubCommand extends Command<ExitCode> {
+  @override
+  String get description => throw UnimplementedError();
+
+  @override
+  String get name => throw UnimplementedError();
+}
+
+class CreateCommand extends Command<ExitCode> with IgniteCommand {
   CreateCommand() {
     final packages = context.flameVersionManager.versions;
     final flameVersions = packages[Package.flame]!;
