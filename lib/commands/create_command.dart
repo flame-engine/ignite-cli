@@ -114,7 +114,7 @@ Future<void> createCommand(
     isInteractive: interactive,
     command,
     'org',
-    'Choose an org for your project: ',
+    'Choose an org for your project:',
     desc: 'Note: this is a dot separated list of "packages", '
         'normally in reverse domain notation. '
         'For example: org.flame_engine.games',
@@ -245,6 +245,6 @@ Future<void> createCommand(
     verbose: logger.level == Level.verbose,
   );
 
-  // logger.info('Updated ${files.length} files on top of flutter create.\n');
+  logger.info('Updated ${files.length} files on top of flutter create.\n');
   logger.info('Your new Flame project was successfully created!');
 }
