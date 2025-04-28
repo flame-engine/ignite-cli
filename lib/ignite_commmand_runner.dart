@@ -69,6 +69,6 @@ class IgniteCommandRunner extends CommandRunner<ExitCode> {
     }
   }
 
-  static const _description = 'Ignite your projects with flame; '
+  static const _description = 'Ignite your projects with Flame; '
       'a CLI scaffolding tool to create and setup your Flame projects.';
 }
