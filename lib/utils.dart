@@ -43,8 +43,7 @@ String getString(
 
     if (validation != null) {
       validation = logger.theme.warn(validation);
-      // omit the description on errors?
-      msg = '$message [$validation]';
+      msg = '$message [$validation]'; // omit the description on errors
     }
 
     value = logger.prompt(msg);
