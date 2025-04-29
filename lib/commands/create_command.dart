@@ -7,7 +7,7 @@ import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:ignite_cli/ignite_context.dart';
 import 'package:ignite_cli/templates/template.dart';
 import 'package:ignite_cli/utils.dart';
-import 'package:mason/mason.dart' show ExitCode, red;
+import 'package:mason/mason.dart';
 
 class CreateCommand extends IgniteCommand {
   CreateCommand(super.context) {

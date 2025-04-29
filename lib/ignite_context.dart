@@ -1,4 +1,4 @@
-import 'dart:io' show Directory, Process, ProcessResult;
+import 'dart:io';
 
 import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:mason/mason.dart';
