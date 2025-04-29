@@ -6,7 +6,8 @@ import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:ignite_cli/templates/template.dart';
 import 'package:ignite_cli/utils.dart';
-import 'package:mason/mason.dart';
+import 'package:mason/mason.dart'
+    show DirectoryGeneratorTarget, ExitCode, MasonGenerator, red;
 
 class CreateCommand extends IgniteCommand {
   CreateCommand(super.context) {
@@ -188,14 +189,14 @@ Future<int> createCommand(
   try {
     if (createFolder) {
       progress.update('Running [mkdir] on $actualDir');
-      processResult = await context.process.run('mkdir', [actualDir]);
+      processResult = await context.run('mkdir', [actualDir]);
       if (processResult.exitCode > ExitCode.success.code) {
         return code = processResult.exitCode;
       }
     }
 
     progress.update('Running [flutter create] on $actualDir');
-    processResult = await context.process.run(
+    processResult = await context.run(
       'flutter',
       'create --org $org --project-name $name .'.split(' '),
       workingDirectory: actualDir,
@@ -205,7 +206,7 @@ Future<int> createCommand(
     }
 
     progress.update('Running [rm -rf lib test] on $actualDir');
-    processResult = await context.process.run(
+    processResult = await context.run(
       'rm',
       '-rf lib test'.split(' '),
       workingDirectory: actualDir,
@@ -237,7 +238,7 @@ Future<int> createCommand(
 
     if (!canHaveTests) {
       progress.update('Removing tests');
-      processResult = await context.process.run(
+      processResult = await context.run(
         'rm',
         '-rf test'.split(' '),
         workingDirectory: actualDir,
@@ -248,7 +249,7 @@ Future<int> createCommand(
     }
 
     progress.update('Removing tests');
-    processResult = await context.process.run(
+    processResult = await context.run(
       'flutter',
       'pub get'.split(' '),
       workingDirectory: actualDir,

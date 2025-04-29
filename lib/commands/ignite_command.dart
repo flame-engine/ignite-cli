@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io' show ProcessResult;
+import 'dart:io' show Process, ProcessResult;
 
 import 'package:args/command_runner.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
@@ -19,18 +19,20 @@ class IgniteContext {
   const IgniteContext({
     required this.logger,
     required this.flameVersionManager,
-    required this.process,
   });
 
   final Logger logger;
   final FlameVersionManager flameVersionManager;
-  final IgniteProcess process;
-}
 
-abstract class IgniteProcess {
   Future<ProcessResult> run(
     String executable,
     List<String> arguments, {
     String? workingDirectory,
-  });
+  }) {
+    return Process.run(
+      executable,
+      arguments,
+      workingDirectory: workingDirectory,
+    );
+  }
 }

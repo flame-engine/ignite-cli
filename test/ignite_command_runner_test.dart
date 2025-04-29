@@ -12,45 +12,32 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockFlameVersionManager extends Mock implements FlameVersionManager {}
 
-class _MockIgniteProcess extends Mock implements IgniteProcess {}
-
 class _MockStdin extends Mock implements Stdin {}
 
 class _MockStdout extends Mock implements Stdout {}
 
-const usage =
-    '''Ignite your projects with Flame; a CLI scaffolding tool to create and setup your Flame projects.
-
-Usage: ignite <command> [arguments]
-
-Global options:
--h, --help            Print this usage information.
-    --[no-]verbose
-    --version         Print the current version.
-
-Available commands:
-  create   Create a new Flame project
-
-Run "ignite help <command>" for more information about a command.''';
+class _MockIgniteContext extends Mock implements IgniteContext {}
 
 void main() {
   group('IgniteCommandRunner', () {
     late Logger logger;
-    late IgniteProcess process;
     late IgniteCommandRunner commandRunner;
     late FlameVersionManager flameVersionManager;
     late Stdin stdin;
     late Stdout stdout; // ignore: close_sinks
+    late IgniteContext context;
 
     setUp(() {
       logger = _MockLogger();
       flameVersionManager = _MockFlameVersionManager();
-      process = _MockIgniteProcess();
       stdin = _MockStdin();
       stdout = _MockStdout();
+      context = _MockIgniteContext();
+      when(() => context.logger).thenReturn(logger);
+      when(() => context.flameVersionManager).thenReturn(flameVersionManager);
 
       when(
-        () => process.run(
+        () => context.run(
           any(),
           any(),
           workingDirectory: any(named: 'workingDirectory'),
@@ -61,13 +48,7 @@ void main() {
         Package.flame: const Versions(['1.28.1']),
       });
 
-      commandRunner = IgniteCommandRunner(
-        IgniteContext(
-          logger: logger,
-          flameVersionManager: flameVersionManager,
-          process: process,
-        ),
-      );
+      commandRunner = IgniteCommandRunner(context);
     });
 
     test('exits with code 0 when [version] is called', () async {
@@ -75,8 +56,8 @@ void main() {
       expect(exitCode, equals(ExitCode.success.code));
 
       verify(() => logger.info('ignite --version: $igniteVersion\n'));
-      verify(() => process.run('flutter', ['--version'])).called(1);
-      verify(() => process.run('dart', ['--version'])).called(1);
+      verify(() => context.run('flutter', ['--version'])).called(1);
+      verify(() => context.run('dart', ['--version'])).called(1);
       verifyNever(() => logger.err(any()));
     });
 

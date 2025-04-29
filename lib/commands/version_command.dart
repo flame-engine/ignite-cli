@@ -7,8 +7,8 @@ Future<int> versionCommand(IgniteContext context) async {
   context.logger.info('ignite --version: $igniteVersion\n');
 
   final (dartProcess, flutterProcess) = await (
-    context.process.run('dart', ['--version']),
-    context.process.run('flutter', ['--version']),
+    context.run('dart', ['--version']),
+    context.run('flutter', ['--version']),
   ).wait;
 
   if (dartProcess.stdout case final String out) {

@@ -10,24 +10,8 @@ Future<void> main(List<String> args) async {
     IgniteContext(
       logger: Logger(),
       flameVersionManager: await FlameVersionManager.fetch(),
-      process: _IgniteProcess(),
     ),
   );
 
   exit(await runner.run(args));
-}
-
-class _IgniteProcess extends IgniteProcess {
-  @override
-  Future<ProcessResult> run(
-    String executable,
-    List<String> arguments, {
-    String? workingDirectory,
-  }) {
-    return Process.run(
-      executable,
-      arguments,
-      workingDirectory: workingDirectory,
-    );
-  }
 }
