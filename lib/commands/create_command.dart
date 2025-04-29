@@ -121,16 +121,16 @@ Future<int> createCommand(
   );
 
   final versions = context.flameVersionManager.versions;
-  final flameVersions = versions[Package.flame];
+  final flameVersions = versions[Package.flame]!;
   final flameVersion = getOption(
     logger: context.logger,
     isInteractive: interactive,
     command,
     'flame-version',
     'Which Flame version do you wish to use?',
-    (flameVersions?.visible ?? []).associateWith((e) => e),
-    defaultsTo: flameVersions?.versions.first,
-    fullOptions: flameVersions?.versions.associateWith((e) => e) ?? {},
+    flameVersions.visible.associateWith((e) => e),
+    defaultsTo: flameVersions.versions.first,
+    fullOptions: flameVersions.versions.associateWith((e) => e),
   );
 
   final extraPackageOptions = context.flameVersionManager.versions.keys
