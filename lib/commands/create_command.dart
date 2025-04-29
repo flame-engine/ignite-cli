@@ -183,14 +183,14 @@ Future<int> createCommand(
 
   final progress = context.logger.progress('Generating project');
   ProcessResult? processResult;
-  var exitCode = ExitCode.success.code;
+  var code = ExitCode.success.code;
 
   try {
     if (createFolder) {
       progress.update('Running [mkdir] on $actualDir');
       processResult = await context.process.run('mkdir', [actualDir]);
       if (processResult.exitCode > ExitCode.success.code) {
-        return exitCode = processResult.exitCode;
+        return code = processResult.exitCode;
       }
     }
 
@@ -201,7 +201,7 @@ Future<int> createCommand(
       workingDirectory: actualDir,
     );
     if (processResult.exitCode > ExitCode.success.code) {
-      return exitCode = processResult.exitCode;
+      return code = processResult.exitCode;
     }
 
     progress.update('Running [rm -rf lib test] on $actualDir');
@@ -211,7 +211,7 @@ Future<int> createCommand(
       workingDirectory: actualDir,
     );
     if (processResult.exitCode > ExitCode.success.code) {
-      return exitCode = processResult.exitCode;
+      return code = processResult.exitCode;
     }
     progress.update('Bundling game template');
 
@@ -243,7 +243,7 @@ Future<int> createCommand(
         workingDirectory: actualDir,
       );
       if (processResult.exitCode > ExitCode.success.code) {
-        return exitCode = processResult.exitCode;
+        return code = processResult.exitCode;
       }
     }
 
@@ -255,18 +255,18 @@ Future<int> createCommand(
     );
 
     if (processResult.exitCode > ExitCode.success.code) {
-      return exitCode = processResult.exitCode;
+      return code = processResult.exitCode;
     }
 
     progress
       ..complete('Updated ${files.length} files on top of flutter create.')
       ..complete('Your new Flame project was successfully created!');
 
-    return exitCode;
+    return code;
   } catch (_) {
     if (processResult != null) {
       progress.fail(processResult.stderr.toString());
-      exitCode = processResult.exitCode;
+      code = processResult.exitCode;
     } else {
       progress.fail();
     }
