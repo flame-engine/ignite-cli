@@ -1,11 +1,31 @@
-import 'package:ignite_cli/version.g.dart';
-import 'package:process_run/process_run.dart';
+import 'dart:math';
 
-Future<void> versionCommand() async {
-  print(r'$ ignite --version:');
-  print(igniteVersion);
-  print('');
-  await runExecutableArguments('dart', ['--version'], verbose: true);
-  print('');
-  await runExecutableArguments('flutter', ['--version'], verbose: true);
+import 'package:ignite_cli/ignite_context.dart';
+import 'package:ignite_cli/version.g.dart';
+
+Future<int> versionCommand(IgniteContext context) async {
+  context.logger.info('ignite --version: $igniteVersion\n');
+
+  final (dartProcess, flutterProcess) = await (
+    context.run('dart', ['--version']),
+    context.run('flutter', ['--version']),
+  ).wait;
+
+  if (dartProcess.stdout case final String out) {
+    context.logger.info(out);
+  }
+
+  if (flutterProcess.stdout case final String out) {
+    context.logger.info(out);
+  }
+
+  if (dartProcess.stderr case final String err when err.isNotEmpty) {
+    context.logger.err(err);
+  }
+
+  if (flutterProcess.stderr case final String err when err.isNotEmpty) {
+    context.logger.err(err);
+  }
+
+  return max<int>(dartProcess.exitCode, flutterProcess.exitCode);
 }

@@ -1,9 +1,5 @@
 include: package:flame_lint/analysis_options.yaml
 
-linter:
-  rules:
-    avoid_print: false # since it is a CLI application
-
 analyzer:
   exclude:
-    - bricks/
+    - bricks/**/*
