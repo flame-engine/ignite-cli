@@ -60,45 +60,33 @@ String getOption(
   Map<String, String> options, {
   required bool isInteractive,
   required Logger logger,
-  String? desc,
   String? defaultsTo,
   Map<String, String> fullOptions = const {},
 }) {
-  var value = results[name];
+  var value = results[name]?.toString();
 
   if (!isInteractive) {
     if (value == null) {
       if (defaultsTo != null) {
         return defaultsTo;
       } else {
-        logger.info('Missing parameter $name is required.');
+        logger.err('Missing parameter $name is required.');
         exit(ExitCode.usage.code);
       }
     }
   }
   final fullValues = {...options, ...fullOptions}.values;
   if (value != null && !fullValues.contains(value)) {
-    logger.info('Invalid value $value provided. Must be in: ${options.values}');
+    logger.err('Invalid value $value provided. Must be in: ${options.values}');
     value = null;
   }
 
   while (value == null) {
-    if (desc != null) {
-      logger.info(darkGray.wrap('\n$desc\u{1B}[1A\r'));
-    }
-
     final option = logger.chooseOne(message, choices: options.keys.toList());
     value = options[option];
-
-    if (desc != null) {
-      logger.info('\r\u{1B}[K');
-    }
   }
-  return switch (value) {
-    final String value => value,
-    final bool value => 'true',
-    _ => '',
-  };
+
+  return value;
 }
 
 List<String> _unwrap(dynamic value) {
@@ -142,6 +130,7 @@ List<String> getMultiOption(
     logger.info('Invalid value $value provided. Must be in: $options');
     value = [];
   }
+
   if (desc != null) {
     logger.info(darkGray.wrap('\n$desc\u{1B}[1A\r'));
   }

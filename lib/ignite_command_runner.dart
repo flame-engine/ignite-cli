@@ -5,27 +5,14 @@ import 'package:args/command_runner.dart';
 import 'package:ignite_cli/commands/create_command.dart';
 import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/commands/version_command.dart';
-import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:mason_logger/mason_logger.dart';
 
-class IgniteCommandRunner extends CommandRunner<ExitCode> {
+class IgniteCommandRunner extends CommandRunner<int> {
   late IgniteContext context;
 
-  IgniteCommandRunner({
-    required Logger logger,
-    required FlameVersionManager flameVersionManager,
-  }) : super('ignite', _description) {
-    context = IgniteContext(
-      logger: logger,
-      flameVersionManager: flameVersionManager,
-    );
-
+  IgniteCommandRunner(this.context) : super('ignite', _description) {
     addCommand(CreateCommand(context));
-
-    argParser.addFlag(
-      'verbose',
-    );
-
+    argParser.addFlag('verbose');
     argParser.addFlag(
       'version',
       help: 'Print the current version.',
@@ -34,7 +21,10 @@ class IgniteCommandRunner extends CommandRunner<ExitCode> {
   }
 
   @override
-  Future<ExitCode> run(Iterable<String> args) async {
+  void printUsage() => context.logger.info(usage);
+
+  @override
+  Future<int> run(Iterable<String> args) async {
     try {
       final parsedArgs = parse(args);
 
@@ -43,29 +33,28 @@ class IgniteCommandRunner extends CommandRunner<ExitCode> {
       }
 
       if (parsedArgs['version'] == true) {
-        await versionCommand(context.logger);
-        return ExitCode.success;
+        return await versionCommand(context);
       }
 
-      return await runCommand(parsedArgs) ?? ExitCode.success;
+      return await runCommand(parsedArgs) ?? ExitCode.success.code;
     } on FormatException catch (exception) {
       context.logger
         ..err(exception.message)
         ..info('')
         ..info(usage);
-      return ExitCode.usage;
+      return ExitCode.usage.code;
     } on UsageException catch (exception) {
       context.logger
         ..err(exception.message)
         ..info('')
         ..info(exception.usage);
-      return ExitCode.usage;
+      return ExitCode.usage.code;
     } on ProcessException catch (error) {
       context.logger.err(error.message);
-      return ExitCode.unavailable;
+      return ExitCode.unavailable.code;
     } on Exception catch (error) {
       context.logger.err('$error');
-      return ExitCode.software;
+      return ExitCode.software.code;
     }
   }
 

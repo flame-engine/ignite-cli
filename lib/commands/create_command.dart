@@ -7,7 +7,6 @@ import 'package:ignite_cli/flame_version_manager.dart';
 import 'package:ignite_cli/templates/template.dart';
 import 'package:ignite_cli/utils.dart';
 import 'package:mason/mason.dart';
-import 'package:process_run/process_run.dart';
 
 class CreateCommand extends IgniteCommand {
   CreateCommand(super.context) {
@@ -63,38 +62,33 @@ class CreateCommand extends IgniteCommand {
   String get name => 'create';
 
   @override
-  Future<ExitCode> run() async {
+  Future<int> run() async {
     final argResults = this.argResults;
     if (argResults == null) {
-      return ExitCode.usage;
+      return ExitCode.usage.code;
     }
 
-    await createCommand(
-      context.logger,
-      argResults,
-      context.flameVersionManager,
-    );
+    final code = await createCommand(context, argResults);
 
-    return ExitCode.success;
+    return code;
   }
 }
 
-Future<void> createCommand(
-  Logger logger,
+Future<int> createCommand(
+  IgniteContext context,
   ArgResults command,
-  FlameVersionManager flameVersionManager,
 ) async {
   final interactive = command['interactive'] != 'false';
 
   if (interactive) {
-    logger
+    context.logger
       ..info('\nWelcome to ${red.wrap('Ignite CLI')}! 🔥')
       ..info("Let's create a new project!\n");
   }
 
   final name = getString(
     isInteractive: interactive,
-    logger: logger,
+    logger: context.logger,
     command,
     'name',
     'Choose a name for your project',
@@ -110,7 +104,7 @@ Future<void> createCommand(
   );
 
   final org = getString(
-    logger: logger,
+    logger: context.logger,
     isInteractive: interactive,
     command,
     'org',
@@ -125,25 +119,25 @@ Future<void> createCommand(
     },
   );
 
-  final versions = flameVersionManager.versions;
-  final flameVersions = versions[Package.flame]!;
+  final versions = context.flameVersionManager.versions;
+  final flameVersions = versions[Package.flame];
   final flameVersion = getOption(
-    logger: logger,
+    logger: context.logger,
     isInteractive: interactive,
     command,
     'flame-version',
     'Which Flame version do you wish to use?',
-    flameVersions.visible.associateWith((e) => e),
-    defaultsTo: flameVersions.versions.first,
-    fullOptions: flameVersions.versions.associateWith((e) => e),
+    (flameVersions?.visible ?? []).associateWith((e) => e),
+    defaultsTo: flameVersions?.versions.first,
+    fullOptions: flameVersions?.versions.associateWith((e) => e) ?? {},
   );
 
-  final extraPackageOptions = flameVersionManager.versions.keys
+  final extraPackageOptions = context.flameVersionManager.versions.keys
       .where((key) => !Package.includedByDefault.contains(key))
       .map((key) => key.name)
       .toList();
   final extraPackages = getMultiOption(
-    logger: logger,
+    logger: context.logger,
     isInteractive: interactive,
     isRequired: false,
     command,
@@ -162,25 +156,21 @@ Future<void> createCommand(
   final devDependencies = packages.where((e) => e.isDevDependency);
 
   final currentDir = Directory.current.path;
-  logger.info('\nYour current directory is: $currentDir');
 
-  final createFolder = getOption(
-        logger: logger,
-        isInteractive: interactive,
-        command,
-        'create-folder',
-        'Do you want to put your project files directly on the current dir, '
-            'or do you want to create a folder called $name?',
-        {
-          'Create a folder called $name': 'true',
-          'Put the files directly on $currentDir': 'false',
-        },
-      ) ==
-      'true';
+  context.logger.info('Your current directory is: $currentDir');
 
-  logger.info('\n');
+  bool createFolder;
+  if (!interactive) {
+    createFolder = command['create-folder'] == true;
+  } else {
+    createFolder = context.logger.confirm(
+      'Create project a folder called $name?',
+      defaultValue: command['create-folder'] == true,
+    );
+  }
+
   final template = getOption(
-    logger: logger,
+    logger: context.logger,
     isInteractive: interactive,
     command,
     'template',
@@ -190,61 +180,97 @@ Future<void> createCommand(
   );
 
   final actualDir = '$currentDir${createFolder ? '/$name' : ''}';
-  if (createFolder) {
-    await runExecutableArguments('mkdir', [actualDir]);
-  }
-  logger.info('\nRunning flutter create on $actualDir ...');
 
-  await runExecutableArguments(
-    'flutter',
-    'create --org $org --project-name $name .'.split(' '),
-    workingDirectory: actualDir,
-    verbose: logger.level == Level.verbose,
-  );
+  final progress = context.logger.progress('Generating project');
+  ProcessResult? processResult;
+  var exitCode = ExitCode.success.code;
 
-  await runExecutableArguments(
-    'rm',
-    '-rf lib test'.split(' '),
-    workingDirectory: actualDir,
-    verbose: logger.level == Level.verbose,
-  );
+  try {
+    if (createFolder) {
+      progress.update('Running [mkdir] on $actualDir');
+      processResult = await context.process.run('mkdir', [actualDir]);
+      if (processResult.exitCode > ExitCode.success.code) {
+        return exitCode = processResult.exitCode;
+      }
+    }
 
-  final bundle = Template.byKey(template).bundle;
-  final generator = await MasonGenerator.fromBundle(bundle);
-  final target = DirectoryGeneratorTarget(Directory(actualDir));
-
-  final variables = <String, dynamic>{
-    'name': name,
-    'description': 'A simple Flame game.',
-    'version': '0.1.0',
-    'extra-dependencies': dependencies
-        .sortedBy((e) => e.name)
-        .map((package) => package.toMustache(versions, flameVersion))
-        .toList(),
-    'extra-dev-dependencies': devDependencies
-        .sortedBy((e) => e.name)
-        .map((package) => package.toMustache(versions, flameVersion))
-        .toList(),
-  };
-  final files = await generator.generate(target, vars: variables);
-
-  final canHaveTests = devDependencies.contains(Package.flameTest);
-  if (!canHaveTests) {
-    await runExecutableArguments(
-      'rm',
-      '-rf test'.split(' '),
+    progress.update('Running [flutter create] on $actualDir');
+    processResult = await context.process.run(
+      'flutter',
+      'create --org $org --project-name $name .'.split(' '),
       workingDirectory: actualDir,
-      verbose: logger.level == Level.verbose,
     );
+    if (processResult.exitCode > ExitCode.success.code) {
+      return exitCode = processResult.exitCode;
+    }
+
+    progress.update('Running [rm -rf lib test] on $actualDir');
+    processResult = await context.process.run(
+      'rm',
+      '-rf lib test'.split(' '),
+      workingDirectory: actualDir,
+    );
+    if (processResult.exitCode > ExitCode.success.code) {
+      return exitCode = processResult.exitCode;
+    }
+    progress.update('Bundling game template');
+
+    final bundle = Template.byKey(template).bundle;
+    final generator = await MasonGenerator.fromBundle(bundle);
+    final target = DirectoryGeneratorTarget(Directory(actualDir));
+
+    final variables = <String, dynamic>{
+      'name': name,
+      'description': 'A simple Flame game.',
+      'version': '0.1.0',
+      'extra-dependencies': dependencies
+          .sortedBy((e) => e.name)
+          .map((package) => package.toMustache(versions, flameVersion))
+          .toList(),
+      'extra-dev-dependencies': devDependencies
+          .sortedBy((e) => e.name)
+          .map((package) => package.toMustache(versions, flameVersion))
+          .toList(),
+    };
+    final files = await generator.generate(target, vars: variables);
+    final canHaveTests = devDependencies.contains(Package.flameTest);
+
+    if (!canHaveTests) {
+      progress.update('Removing tests');
+      processResult = await context.process.run(
+        'rm',
+        '-rf test'.split(' '),
+        workingDirectory: actualDir,
+      );
+      if (processResult.exitCode > ExitCode.success.code) {
+        return exitCode = processResult.exitCode;
+      }
+    }
+
+    progress.update('Removing tests');
+    processResult = await context.process.run(
+      'flutter',
+      'pub get'.split(' '),
+      workingDirectory: actualDir,
+    );
+
+    if (processResult.exitCode > ExitCode.success.code) {
+      return exitCode = processResult.exitCode;
+    }
+
+    progress
+      ..complete('Updated ${files.length} files on top of flutter create.')
+      ..complete('Your new Flame project was successfully created!');
+
+    return exitCode;
+  } catch (_) {
+    if (processResult != null) {
+      progress.fail(processResult.stderr.toString());
+      exitCode = processResult.exitCode;
+    } else {
+      progress.fail();
+    }
+
+    rethrow;
   }
-
-  await runExecutableArguments(
-    'flutter',
-    'pub get'.split(' '),
-    workingDirectory: actualDir,
-    verbose: logger.level == Level.verbose,
-  );
-
-  logger.info('Updated ${files.length} files on top of flutter create.\n');
-  logger.info('Your new Flame project was successfully created!');
 }

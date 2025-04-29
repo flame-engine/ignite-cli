@@ -1,32 +1,31 @@
+import 'dart:math';
+
+import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/version.g.dart';
-import 'package:mason/mason.dart';
-import 'package:process_run/process_run.dart';
 
-Future<void> versionCommand(Logger logger) async {
-  logger.info('ignite --version: $igniteVersion\n');
+Future<int> versionCommand(IgniteContext context) async {
+  context.logger.info('ignite --version: $igniteVersion\n');
 
-  final [dartProcess, flutterProcess] = await [
-    runExecutableArguments(
-      'dart',
-      ['--version'],
-      commandVerbose: false,
-      verbose: false,
-    ),
-    runExecutableArguments(
-      'flutter',
-      ['--version'],
-      commandVerbose: false,
-      verbose: false,
-    ),
-  ].wait;
+  final (dartProcess, flutterProcess) = await (
+    context.process.run('dart', ['--version']),
+    context.process.run('flutter', ['--version']),
+  ).wait;
 
-  logger.info('${dartProcess.stdout}');
-  logger.info('${flutterProcess.stdout}');
+  if (dartProcess.stdout case final String out) {
+    context.logger.info(out);
+  }
+
+  if (flutterProcess.stdout case final String out) {
+    context.logger.info(out);
+  }
 
   if (dartProcess.stderr case final String err when err.isNotEmpty) {
-    logger.err(err);
+    context.logger.err(err);
   }
+
   if (flutterProcess.stderr case final String err when err.isNotEmpty) {
-    logger.err(err);
+    context.logger.err(err);
   }
+
+  return max<int>(dartProcess.exitCode, flutterProcess.exitCode);
 }
