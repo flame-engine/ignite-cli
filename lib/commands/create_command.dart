@@ -4,10 +4,10 @@ import 'package:args/args.dart';
 import 'package:dartlin/dartlin.dart';
 import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/flame_version_manager.dart';
+import 'package:ignite_cli/ignite_context.dart';
 import 'package:ignite_cli/templates/template.dart';
 import 'package:ignite_cli/utils.dart';
-import 'package:mason/mason.dart'
-    show DirectoryGeneratorTarget, ExitCode, MasonGenerator, red;
+import 'package:mason/mason.dart' show ExitCode, red;
 
 class CreateCommand extends IgniteCommand {
   CreateCommand(super.context) {
@@ -217,8 +217,8 @@ Future<int> createCommand(
     progress.update('Bundling game template');
 
     final bundle = Template.byKey(template).bundle;
-    final generator = await MasonGenerator.fromBundle(bundle);
-    final target = DirectoryGeneratorTarget(Directory(actualDir));
+    final generator = await context.generatorFromBundle(bundle);
+    final target = context.createTarget(Directory(actualDir));
 
     final variables = <String, dynamic>{
       'name': name,
@@ -233,6 +233,7 @@ Future<int> createCommand(
           .map((package) => package.toMustache(versions, flameVersion))
           .toList(),
     };
+
     final files = await generator.generate(target, vars: variables);
     final canHaveTests = devDependencies.contains(Package.flameTest);
 

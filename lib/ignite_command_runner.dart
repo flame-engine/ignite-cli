@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:ignite_cli/commands/create_command.dart';
-import 'package:ignite_cli/commands/ignite_command.dart';
 import 'package:ignite_cli/commands/version_command.dart';
+import 'package:ignite_cli/ignite_context.dart';
 import 'package:mason_logger/mason_logger.dart';
 
 class IgniteCommandRunner extends CommandRunner<int> {

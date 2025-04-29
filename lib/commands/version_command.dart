@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ignite_cli/commands/ignite_command.dart';
+import 'package:ignite_cli/ignite_context.dart';
 import 'package:ignite_cli/version.g.dart';
 
 Future<int> versionCommand(IgniteContext context) async {
